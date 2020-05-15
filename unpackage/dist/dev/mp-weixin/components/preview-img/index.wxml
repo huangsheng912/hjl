@@ -1,1 +1,0 @@
-<view data-event-opts="{{[['tap',[['previewImg',['$event']]]]]}}" class="preview-wrap data-v-ae0b663a" bindtap="__e"><image src="{{url}}" mode="scaleToFill" class="data-v-ae0b663a"></image></view>

@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "打卡详情",
-  "usingComponents": {
-    "sight-item": "/components/sight-item/index"
-  }
-}
