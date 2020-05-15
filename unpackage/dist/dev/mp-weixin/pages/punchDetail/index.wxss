@@ -1,0 +1,42 @@
+.punch-detail .comment-list {
+  padding: 20rpx 30rpx;
+}
+.punch-detail .comment-list .avatar {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  background-color: red;
+  margin-right: 25rpx;
+}
+.punch-detail .comment-list .info {
+  -webkit-box-flex: 1;
+  -webkit-flex: 1;
+          flex: 1;
+}
+.punch-detail .comment-list .info .comment-name {
+  font-size: 24rpx;
+  line-height: 40rpx;
+  color: #626366;
+}
+.punch-detail .comment-list .info .comment-desc {
+  font-size: 26rpx;
+  line-height: 40rpx;
+}
+.punch-detail .comment-list .info .comment-replys {
+  background-color: #f0f3f9;
+  border-radius: 10rpx;
+  font-size: 26rpx;
+  padding: 20rpx;
+}
+.punch-detail .comment-list .info .comment-replys view {
+  line-height: 1.5;
+}
+.punch-detail .comment-list .info .comment-replys text {
+  color: #00cedb;
+  margin-right: 10rpx;
+}
+.punch-detail .comment-list .info .comment-time {
+  font-size: 24rpx;
+  color: #8e939c;
+}
+

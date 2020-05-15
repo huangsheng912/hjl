@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "景区详情",
+  "usingComponents": {
+    "preview-img": "/components/preview-img/index",
+    "sight-item": "/components/sight-item/index"
+  }
+}

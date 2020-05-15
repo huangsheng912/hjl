@@ -1,0 +1,7 @@
+.hot-sights .sight-list .info-bottom .fr:last-of-type {
+  margin-right: 44rpx;
+}
+.hot-sights .sight-list .info-bottom .fr:last-of-type .icon-heart-fill {
+  color: #fa6464;
+}
+
