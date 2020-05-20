@@ -112,6 +112,27 @@
 
 <style lang="less">
 	.punch-detail {
+		preview-img {
+			/deep/.preview-wrap {
+				width: 215rpx;
+				height: 215rpx;
+				margin-right: 20rpx;
+				margin-bottom: 20rpx;
+			}
+			&:nth-of-type(3n) /deep/ .preview-wrap {
+				margin-right: 0
+			}
+		}
+		operate-button /deep/.operate-btn-wrap {
+			button {
+				line-height: 98rpx;
+				color: #8e939c!important;
+				font-size: 24rpx;
+				text {
+					margin-right: 15rpx;
+				}
+			}
+		}
 		.comment-list {
 			padding: 20rpx 30rpx;
 			.avatar {
@@ -123,7 +144,7 @@
 			}
 			.info {
 				flex: 1;
-				
+				padding: 6rpx 0;
 				.comment-name {
 					font-size: 24rpx;
 					line-height: 40rpx;
@@ -138,6 +159,7 @@
 					border-radius: 10rpx;
 					font-size: 26rpx;
 					padding: 20rpx;
+					margin-top: 10rpx;
 					view {
 						line-height: 1.5;
 					}
@@ -149,6 +171,7 @@
 				.comment-time {
 					font-size: 24rpx;
 					color: #8e939c;
+					line-height: 2.5;
 				}
 			}
 			

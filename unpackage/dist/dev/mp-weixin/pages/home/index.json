@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "首页",
+  "usingComponents": {
+    "area-search": "/components/area-search/index",
+    "sight-item": "/components/sight-item/index",
+    "share-poster": "/components/share-poster/index"
+  }
+}

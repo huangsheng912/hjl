@@ -95,9 +95,15 @@
 <style lang="less">
 	.hot-sights {
 		.sight-list {
+			.info-title {
+				font-size: 30rpx;
+			}
 			.info-bottom {
 				.fr:last-of-type {
 					margin-right: 44rpx;
+					.iconfont {
+						margin-right: 5rpx;
+					}
 					.icon-heart-fill {
 						color: #fa6464;
 					}

@@ -133,7 +133,7 @@
 			font-size: 24rpx;
 			color: #8e939c;
 			.iconfont {
-				margin-right: 12rpx;
+				margin-right: 8rpx;
 			}
 			.icon-heart-fill {
 				margin-left: 30rpx;

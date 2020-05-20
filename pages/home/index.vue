@@ -1,6 +1,18 @@
 <template>
 	<view class="home-page">
 		<area-search @change="changeArea"></area-search>
+		<button type="default" @click="publish">生成海报</button>
+		<share-poster 
+			ref="sharePoster" 
+			:width=this.width
+			:avatar=shareInfo.avatar
+			:userName=shareInfo.name
+			:time=shareInfo.time
+			:desc=shareInfo.desc
+			:imgSrc=shareInfo.imgList
+			QrSrc="../../static/img/qrCode.jpg"
+			@success="generateSuccess"
+		></share-poster>
 		<view class="home-swiper">
 			<swiper 
 			:indicator-dots="true" 
@@ -58,20 +70,38 @@
 <script>
 	import areaSearch from '@/components/area-search/index.vue'
 	import sightItem from '@/components/sight-item/index.vue'
+	import sharePoster from '@/components/share-poster/index.vue'
 	export default {
 		data() {
 			return {
-				sights: []
+				sights: [],
+				shareInfo: {}
 			}
 		},
 		components:{
 			areaSearch,
-			sightItem
+			sightItem,
+			sharePoster
 		},
 		created() {
 			this.getPunchingList()
 		},
 		methods: {
+			publish() {
+				this.$refs.sharePoster.generatePoster()
+			},
+			generateSuccess(path) {
+				uni.previewImage({
+					current: path,
+					urls:	[path],
+					success(s) {
+						console.log(s,1)
+					},
+					fail(e) {
+						console.log(e,2)
+					}
+				})
+			},
 			getPunchingList() {
 				const userInfo = uni.getStorageSync('userInfo')
 				this.userInfo = userInfo
@@ -88,10 +118,14 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'../../static/img/punch.png',
-								'../../static/img/hot-sight.png',
-								'../../static/img/integral.png',
-								'../../static/img/exchange.png',
+								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
+								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
 							],
 							like: 236,
 							comments: 222,
@@ -105,10 +139,10 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'../../static/img/punch.png',
-								'../../static/img/hot-sight.png',
-								'../../static/img/integral.png',
-								'../../static/img/exchange.png',
+								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
 							],
 							like: 26,
 							comments: 22,
@@ -122,10 +156,10 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'../../static/img/punch.png',
-								'../../static/img/hot-sight.png',
-								'../../static/img/integral.png',
-								'../../static/img/exchange.png',
+								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
+								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
 							],
 							like: 234,
 							comments: 223,
@@ -133,6 +167,7 @@
 							place: '玉龙雪山'
 						}
 					]
+					this.shareInfo = this.sights[0]
 					uni.hideLoading()
 				},1500)
 			},

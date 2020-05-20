@@ -1,7 +1,7 @@
+node_modules/
+.project
+unpackage/
 .DS_Store
-node_modules
-/dist
-/unpackage
 
 # local env files
 .env.local

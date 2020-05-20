@@ -1,0 +1,7 @@
+{
+  "component": true,
+  "usingComponents": {
+    "operate-button": "/components/operate-button/index",
+    "preview-img": "/components/preview-img/index"
+  }
+}

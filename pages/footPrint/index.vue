@@ -1,6 +1,13 @@
 <template>
 	<view class="foot-print">
-		<image class="foot-map" src="../../static/img/myFootPrint.png" mode="scaleToFill"></image>
+		<image class="foot-map" :src="footSrc" mode="scaleToFill"></image>
+		<!-- <uni-ec-canvas 
+			class="uni-ec-canvas foot-map"
+			id="uni-ec-canvas"
+			ref="uni-ec-canvas"
+			canvas-id="uni-ec-canvas"
+			:ec="ec"
+	 ></uni-ec-canvas> -->
 		<view class="foot-print-list">
 			<view class="foot-print-item" v-for="item in footPrints" :key="item.time">
 				<view class="time">{{item.time}}</view>
@@ -29,7 +36,8 @@
 	export default {
 		data() {
 			return {
-				footPrints:[]
+				footSrc: '../../static/img/footPrint.png',
+				footPrints:[],
 			}
 		},
 		components: {
@@ -43,8 +51,8 @@
 				})
 			}
 		},
-		created() {
-			this.getFootPrints()
+		async created() {
+			await this.getFootPrints()
 		},
 		onShareAppMessage(res) {
 			return {
@@ -54,7 +62,6 @@
 		}, 
 		methods: {
 			getFootPrints() {
-				console.log(777888999)
 				uni.showLoading({
 					title: '加载中...',
 					mask: true
@@ -109,6 +116,7 @@
 		.foot-map {
 			height: 380rpx;
 			width: 100%;
+			display: block;
 		}
 		.foot-print-list {
 			padding: 30rpx;
@@ -161,9 +169,12 @@
 				.item-bottom {
 					color: #8e949c;
 					font-size: 24rpx;
+					.iconfont {
+						margin-right: 8rpx;
+					}
 					.icon-heart-fill {
-						margin-left: 40rpx;
-						margin-right: 10rpx;
+						margin-left: 35rpx;
+						color: #fa6464;
 					}
 					.icon-icon-test {
 						color: #8e949c;
