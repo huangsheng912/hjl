@@ -1,18 +1,6 @@
 <template>
 	<view class="home-page">
 		<area-search @change="changeArea"></area-search>
-		<button type="default" @click="publish">生成海报</button>
-		<share-poster 
-			ref="sharePoster" 
-			:width=this.width
-			:avatar=shareInfo.avatar
-			:userName=shareInfo.name
-			:time=shareInfo.time
-			:desc=shareInfo.desc
-			:imgSrc=shareInfo.imgList
-			QrSrc="../../static/img/qrCode.jpg"
-			@success="generateSuccess"
-		></share-poster>
 		<view class="home-swiper">
 			<swiper 
 			:indicator-dots="true" 
@@ -61,7 +49,7 @@
 		<view class="recommend-route">
 			<view class="title"><text>正在打卡</text></view>
 			<block v-for="item in sights" :key="item.id">
-				<sight-item :sightInfo="item" share></sight-item>
+				<sight-item :sightInfo="item" share ></sight-item>
 			</block>
 		</view>
 	</view>
@@ -70,38 +58,40 @@
 <script>
 	import areaSearch from '@/components/area-search/index.vue'
 	import sightItem from '@/components/sight-item/index.vue'
-	import sharePoster from '@/components/share-poster/index.vue'
 	export default {
 		data() {
 			return {
-				sights: [],
-				shareInfo: {}
+				sights: []
 			}
 		},
 		components:{
 			areaSearch,
 			sightItem,
-			sharePoster
+		},
+		onShareAppMessage(res) {
+			console.log(res,'===res')
+			if (res.from === 'button') {// 来自页面内分享按钮
+				const shareInfo = res.target.dataset.info
+				const desc = shareInfo.desc
+				const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
+				return {
+					title,
+					imageUrl: shareInfo.imgList[0],
+					path: `/pages/punchDetail/index?id=${shareInfo.id}`
+				}
+			} else {
+				return {
+					title: '慧景链456798',
+					path: '/pages/home/index',
+					imageUrl: '../../static/img/integral.png'
+				}
+			}
+			
 		},
 		created() {
 			this.getPunchingList()
 		},
 		methods: {
-			publish() {
-				this.$refs.sharePoster.generatePoster()
-			},
-			generateSuccess(path) {
-				uni.previewImage({
-					current: path,
-					urls:	[path],
-					success(s) {
-						console.log(s,1)
-					},
-					fail(e) {
-						console.log(e,2)
-					}
-				})
-			},
 			getPunchingList() {
 				const userInfo = uni.getStorageSync('userInfo')
 				this.userInfo = userInfo
@@ -118,14 +108,14 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
-								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005141542597627.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_2020051901022499206.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062123407084.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
+								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153383899.jpg',
 							],
 							like: 236,
 							comments: 222,
@@ -139,10 +129,10 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
+								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
 							],
 							like: 26,
 							comments: 22,
@@ -156,10 +146,10 @@
 							time: '2020-04-13',
 							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 							imgList: [
-								'https://www.nuls.io/wp-content/uploads/2019/06/reaper.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/1562305343608.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/06/ViVi-zhou.jpg',
-								'https://www.nuls.io/wp-content/uploads/2019/07/WechatIMG212.jpeg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
+								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
+								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
 							],
 							like: 234,
 							comments: 223,
@@ -167,13 +157,26 @@
 							place: '玉龙雪山'
 						}
 					]
-					this.shareInfo = this.sights[0]
 					uni.hideLoading()
 				},1500)
 			},
 			changeArea(e) {
 				console.log(e)
 				
+			},
+			shareByButton() {
+				return new Promise((resolve, reject) => {
+					setTimeout(()=>{
+						const desc = this.shareInfo.desc
+						const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
+						const result = {
+							title,
+							path: `/pages/punchDetail/index?id=${this.shareInfo.id}`,
+							imageUrl: this.shareInfo.imgList[0]
+						}
+						resolve(result)
+					},500)
+				})
 			},
 			toUrl(path) {
 				uni.navigateTo({

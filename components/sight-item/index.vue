@@ -1,12 +1,12 @@
 <template>
-	<view class="common-sight-item">
+	<view class="common-sight-item" v-show="sightInfo.time">
 		<view class="user-info flex">
 			<image class="user-avatar" :src="sightInfo.avatar" mode="scaleToFill"></image>
 			<view class="info">
 				<view class="user-name">{{sightInfo.name}}</view>
 				<text class="time">{{sightInfo.time}}</text>
 			</view>
-			<operate-button v-if="share"><text class="iconfont icon-fenxiang"></text>分享</operate-button>
+			<operate-button v-if="share" :shareItem="sightInfo"><text class="iconfont icon-fenxiang"></text>分享</operate-button>
 		</view>
 		<view class="comment-desc" @click="toPunchDetail(sightInfo.id)">{{sightInfo.desc}}</view>
 		<view class="comment-imgs border-bt-1px">
@@ -23,6 +23,15 @@
 			<view class="fr">
 				<text class="iconfont icon-pinglun1"></text>
 				{{sightInfo.comments}}
+			</view>
+		</view>
+		<view class="share-wrap" v-if="isDetail">
+			<view class="to-friends" @click="handleShare">
+				<operate-button><text class="weixin"></text>发给朋友</operate-button>
+			</view>
+			<view class="to-circle" @click="toFriendCircle">
+				<text class="friends-circle"></text>
+				<text class="to-circle-text">发送至朋友圈</text>
 			</view>
 		</view>
 	</view>
@@ -44,6 +53,10 @@
 			location: {
 				type: Boolean,
 				default: true
+			},
+			isDetail: {
+				type: Boolean,
+				default: false
 			}
 		},
 		components: {
@@ -51,13 +64,20 @@
 			previewImg
 		},
 		methods: {
+			handleShare() {
+				console.log(this, 777888)
+				this.$parent.shareInfo = this.sightInfo
+				this.$emit('handleShare', this.sightInfo)
+			},
+			toFriendCircle() {
+				this.$emit('toFriendCircle', this.sightInfo)
+			},
 			toPunchDetail(id) {
 				uni.navigateTo({
 					url:`/pages/punchDetail/index?id=${id}`,
 				})
 			}
 		}
-		
 	}
 </script>
 
@@ -85,17 +105,18 @@
 					color: #8f949a;
 				}
 			}
-		}
-		/deep/.operate-btn-wrap {
-			button {
-				line-height: 98rpx;
-				color: #8e939c!important;
-				font-size: 24rpx;
-				text {
-					margin-right: 15rpx;
+			/deep/.operate-btn-wrap {
+				button {
+					line-height: 98rpx;
+					color: #8e939c!important;
+					font-size: 24rpx;
+					text {
+						margin-right: 15rpx;
+					}
 				}
 			}
-		} 
+		}
+		 
 		.comment-desc {
 			font-size: 26rpx;
 			line-height: 40rpx;
@@ -138,6 +159,37 @@
 			.icon-heart-fill {
 				margin-left: 30rpx;
 				color: #fa6464;
+			}
+		}
+		.share-wrap {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 80rpx;
+			.weixin,.friends-circle {
+				display: inline-block;
+				width: 36rpx;
+				height: 36rpx;
+				background-repeat: no-repeat;
+				background-size: cover;
+				margin-right: 15rpx;
+			}
+			.weixin {
+				background-image: url(../../static/img/we-chat.png);
+			}
+			.to-circle {
+				line-height: 1;
+				padding-left: 25rpx;
+				border-left: 1px solid #dedfe3;
+				display: flex;
+				align-items: center;
+				.friends-circle {
+					background-image: url(../../static/img/friends-circle.png);
+				}
+				.to-circle-text {
+					color: #0fdd88;
+					font-size: 26rpx;
+				}
 			}
 		}
 	}

@@ -1,6 +1,6 @@
 <template>
 	<view class="punch-detail">
-		<sight-item :sightInfo="sightInfo"></sight-item>
+		<sight-item :sightInfo="sightInfo" isDetail @toFriendCircle="toFriendCircle"></sight-item>
 		<view class="comment-list pd-lr-15">
 			<view class="comment-item flex" v-for="item in comments" :key="item.id">
 				<image :src="item.avatar" mode="" class="avatar"></image>
@@ -20,24 +20,52 @@
 				</view>
 			</view>
 		</view>
+		<share-poster
+			ref="sharePoster" 
+			:cWidth="cWidth"
+			:avatar="sightInfo.avatar"
+			:userName="sightInfo.name"
+			:time="sightInfo.time"
+			:desc="sightInfo.desc"
+			:imgSrc="sightInfo.imgList"
+			QrSrc="../../static/img/qrCode.jpg"
+			@success="generateSuccess"
+		></share-poster>
 	</view>
 </template>
 
 <script>
 	import sightItem from '@/components/sight-item/index.vue'
+	import sharePoster from '@/components/share-poster/index.vue'
 	export default {
 		data() {
 			return {
 				sightInfo:{},
-				comments: []
+				comments: [],
+				cWidth: 375,
 			}
 		},
 		components: {
-			sightItem
+			sightItem,
+			sharePoster
 		},
 		onLoad(options) {
 			console.log(options,'--options')
 			this.getPunchDetail(options.id)
+			uni.getSystemInfo({
+				complete:(r) => {
+					this.cWidth = r.windowWidth
+				}
+			})
+		},
+		onShareAppMessage(res) {
+			const desc = this.sightInfo.desc
+			const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
+			return {
+				title,
+				imageUrl: this.sightInfo.imgList[0],
+				path: `/pages/punchDetail/index?id=${this.sightInfo.id}`
+			}
 		},
 		methods: {
 			getPunchDetail(id) {
@@ -55,10 +83,11 @@
 						time: '2020-04-13',
 						desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
 						imgList: [
-							'../../static/img/punch.png',
-							'../../static/img/hot-sight.png',
-							'../../static/img/integral.png',
-							'../../static/img/exchange.png',
+							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
+							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
+							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
+							'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
+							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
 						],
 						like: 236,
 						comments: 222,
@@ -105,7 +134,24 @@
 					]
 					uni.hideLoading()
 				},1500)
-			}
+			},
+			//生成海报，发送朋友圈
+			toFriendCircle() {
+				this.$refs.sharePoster.generatePoster()
+			},
+			//canvas海报转图片完成回调
+			generateSuccess(path) {
+				uni.previewImage({
+					current: path,
+					urls:	[path],
+					success(s) {
+						console.log(s,1)
+					},
+					fail(e) {
+						console.log(e,2)
+					}
+				})
+			},
 		}
 	}
 </script>
@@ -130,6 +176,18 @@
 				font-size: 24rpx;
 				text {
 					margin-right: 15rpx;
+				}
+			}
+		}
+		.share-wrap {
+			operate-button /deep/.operate-btn-wrap {
+				button {
+					color: #0fdd88!important;
+					font-size: 26rpx;
+					line-height: 1;
+					display: flex;
+					align-items: center;
+					padding-right: 25rpx;
 				}
 			}
 		}

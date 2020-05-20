@@ -1,6 +1,6 @@
 <template>
 	<view class="operate-btn-wrap">
-		<button v-if="type==='share'" type="default" open-type="share" >
+		<button v-if="type==='share'" type="default" open-type="share" :data-info="shareItem">
 			<slot></slot>
 		</button>
 		<button v-else type="default" open-type="getUserInfo" @getuserinfo="getUserInfo" >
@@ -15,6 +15,10 @@
 			type:{
 				type: String,
 				default: 'share'
+			},
+			shareItem: {
+				type: Object,
+				default: ()=>{}
 			}
 		},
 		methods: {

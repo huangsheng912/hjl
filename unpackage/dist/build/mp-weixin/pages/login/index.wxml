@@ -1,1 +1,0 @@
-<view class="login-page flex"><view class="img-wrap"><image src="../../static/img/meActive.png" mode="scaleToFill"></image></view><view class="tip">慧景链申请获取你的用户信息</view><operate-button vue-id="6b4b36ba-1" type="auth" bind:__l="__l" vue-slots="{{['default']}}">授权登录</operate-button></view>

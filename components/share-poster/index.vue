@@ -1,7 +1,5 @@
 <template>
-	<view class="canvas-wrap">
-		<canvas :canvas-id="CanvasID" :style="{ width: canvasW + 'px', height: canvasH + 'px' }"></canvas>
-	</view>
+	<canvas class="canvas-wrap" :canvas-id="CanvasID" :style="{ width: canvasW + 'px', height: canvasH + 'px' }"></canvas>
 </template>
 
 <script>
@@ -13,7 +11,7 @@
 			},
 			cWidth: {
 				type: Number,
-				default: 750
+				default: 375
 			},
 			avatar: {  //用户头像
 				type: String,
@@ -56,7 +54,7 @@
 			},
 			async initCanvas() {
 				this.ctx = uni.createCanvasContext(this.CanvasID,this) //创建canvas绘图上下文
-				this.canvasWidth = uni.upx2px(this.cWidth) //canvas宽度
+				this.canvasWidth = this.cWidth //canvas宽度
 				this.canvasW = this.canvasWidth
 				const line = Math.floor(this.imgSrc.length/3)
 				this.canvasH = uni.upx2px(800)+uni.upx2px(215)*line
@@ -216,14 +214,9 @@
 
 <style lang="less">
 	.canvas-wrap {
-		position: absolute;
-		z-index: -999;
-		opacity: 0;
-		canvas {
-			position: fixed;
-			top: 0;
-			left: 0;
-			transform: translateX(-100%);
-		}
+		position: fixed;
+		top: 0;
+		left: 0;
+		transform: translateX(-100%);
 	}
 </style>
