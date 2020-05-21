@@ -20,6 +20,7 @@
 				//用户信息
 				console.log(e,465)
 				uni.setStorageSync('userInfo', e.detail.userInfo)
+				this.$store.commit('setUserInfo', e.detail.userInfo)
 				uni.showToast({
 					title: '授权成功',
 					success() {

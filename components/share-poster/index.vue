@@ -74,7 +74,6 @@
 				const avatarWidth = uni.upx2px(86) //绘制头像的宽高
 				const imgPath = await this.getImageInfo(this.avatar) //先通过uni.getImageInfo获取图片缓存信息，直接使用this.avatar绘制无效
 				this.drawCircleImg(this.canvasPadding,this.canvasPadding,avatarWidth/2, imgPath)
-
 				this.ctx.setFontSize(uni.upx2px(28));//设置标题字体大小
 				// this.ctx.font=`normal bold ${parseInt(uni.upx2px(28))}px sans-serif`//设置标题字体大小 //真机上设置加粗后无法再变细
 				this.ctx.setFillStyle('#333333'); //设置标题文本颜色
@@ -184,7 +183,7 @@
 				return new Promise((resolve, reject) => {
 					uni.getImageInfo({
 						src: imgSrc,
-						success: function(image) {
+						success(image) {
 							resolve(image.path);
 						},
 						fail(err) {

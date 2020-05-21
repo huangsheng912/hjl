@@ -37,13 +37,13 @@
 				<view class="img-wrap">
 					<image src="../../static/img/integral.png" mode=""></image>
 				</view>
-				<text>领取积分</text>
+				<text class="tx-gray">领取积分</text>
 			</view>
 			<view class="entry-item">
 				<view class="img-wrap">
 					<image src="../../static/img/exchange.png" mode=""></image>
 				</view>
-				<text>积分兑换</text>
+				<text class="tx-gray">积分兑换</text>
 			</view>
 		</view>
 		<view class="recommend-route">
@@ -86,7 +86,6 @@
 					imageUrl: '../../static/img/integral.png'
 				}
 			}
-			
 		},
 		created() {
 			this.getPunchingList()
@@ -229,6 +228,9 @@
 				text {
 					font-size: 24rpx;
 					color: #333;
+					&.tx-gray {
+						color: #c0c0c0;
+					}
 				}
 			}
 		}

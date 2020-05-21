@@ -1,0 +1,1 @@
+<canvas class="canvas-wrap" style="{{'width:'+(canvasW+'px')+';'+('height:'+(canvasH+'px')+';')}}" canvas-id="{{CanvasID}}"></canvas>

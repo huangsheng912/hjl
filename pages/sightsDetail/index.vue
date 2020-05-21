@@ -34,7 +34,27 @@
 			previewImg,
 			sightItem
 		},
+		onShareAppMessage(res) {
+			console.log(res,'===res')
+			if (res.from === 'button') {// 来自页面内分享按钮
+				const shareInfo = res.target.dataset.info
+				const desc = shareInfo.desc
+				const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
+				return {
+					title,
+					imageUrl: shareInfo.imgList[0],
+					path: `/pages/punchDetail/index?id=${shareInfo.id}`
+				}
+			} else {
+				return {
+					title: '慧景链',
+					path: `/pages/sightsDetail/index?id=${this.queryId}&name=${this.queryName}`,
+					imageUrl: '../../static/img/integral.png'
+				}
+			}
+		},
 		onLoad(options) {
+			console.log(options,456)
 			uni.setNavigationBarTitle({
 				title: options.name
 			})

@@ -23,18 +23,7 @@
 		},
 		methods: {
 			getUserInfo(e) {
-				//用户信息
-				console.log(e,465)
-				if (e.detail.userInfo) {
-					uni.setStorageSync('userInfo', e.detail.userInfo)
-					uni.showToast({
-						title: '授权成功',
-						success() {
-							uni.navigateBack()
-						}
-					})
-				}
-				
+				this.$emit('getUserInfo', e)
 			},
 		}
 		

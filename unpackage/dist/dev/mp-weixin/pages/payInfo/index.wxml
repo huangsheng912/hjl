@@ -1,0 +1,1 @@
+<view class="pay-info-page bg-common"><view class="pay-status"><text class="iconfont icon-success"></text>支付成功</view><text class="tip">您的留言即将在大屏幕上置顶显示\n请注意大屏幕</text><view class="status"><text>预计时间</text><view class="time">{{time}}<text>s</text></view><text>{{"队列位置: "+position}}</text></view></view>

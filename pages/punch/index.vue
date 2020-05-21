@@ -74,8 +74,8 @@
 			changePay(e) {
 				this.pay = !this.pay
 				// this.pay = e.detail.value[0] ? true : false
-				this.duration = e.detail.value[0] ? 25 : 0
-				this.money = e.detail.value[0] ? 19.9 : 0
+				this.duration =this.pay ? 25 : 0
+				this.money = this.pay ? 19.9 : 0
 			},
 			switchChange(e) {
 				this.switch = e.detail.value

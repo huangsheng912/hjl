@@ -1,6 +1,7 @@
 <template>
 	<view class="punch-detail">
 		<sight-item :sightInfo="sightInfo" isDetail @toFriendCircle="toFriendCircle"></sight-item>
+		<view class="">{{time1}}--{{time2}}</view>
 		<view class="comment-list pd-lr-15">
 			<view class="comment-item flex" v-for="item in comments" :key="item.id">
 				<image :src="item.avatar" mode="" class="avatar"></image>
@@ -30,6 +31,8 @@
 			:imgSrc="sightInfo.imgList"
 			QrSrc="../../static/img/qrCode.jpg"
 			@success="generateSuccess"
+			@img1="c"
+			@img2="cc"
 		></share-poster>
 	</view>
 </template>
@@ -43,6 +46,8 @@
 				sightInfo:{},
 				comments: [],
 				cWidth: 375,
+				time1: '',
+				time2:""
 			}
 		},
 		components: {
@@ -68,6 +73,14 @@
 			}
 		},
 		methods: {
+			c(e) {
+				this.time1=e
+				console.log(e,'c')
+			},
+			cc(e) {
+				this.time2 = e
+				console.log(e,'cc')
+			},
 			getPunchDetail(id) {
 				const userInfo = uni.getStorageSync('userInfo')
 				this.userInfo = userInfo
@@ -81,13 +94,13 @@
 						avatar: userInfo.avatarUrl,
 						name: userInfo.nickName||'这是一个名字',
 						time: '2020-04-13',
-						desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
+						desc: '请',
 						imgList: [
-							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-							'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
-							'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
+							'https://goss.veer.com/creative/vcg/veer/612/veer-302386254.jpg',
+							'https://goss.veer.com/creative/vcg/veer/612/veer-141542994.jpg',
+							'https://goss.veer.com/creative/vcg/veer/612/veer-153835898.jpg',
+							'https://goss.veer.com/creative/vcg/veer/612/veer-310142646.jpg',
+							'https://goss.veer.com/creative/vcg/veer/612/veer-305264542.jpg',
 						],
 						like: 236,
 						comments: 222,
