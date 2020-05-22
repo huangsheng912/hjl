@@ -1,13 +1,14 @@
 <template>
 	<view class="punch-page">
-		<view class="punch-content pd-lr-15">
+		<nav-bar @handleBack="handleBack" :title="queryName || '打卡留言'"></nav-bar>
+		<view class="punch-content">
 			<input type="text" v-model="comment" placeholder="请输入留言" class="comment-input"/>
 			<view class="upload-imgs">
 				<preview-img :url="item" :urlList="imgs"  v-for="item in imgs" :key="item"></preview-img>
 				<button type="default" @click="chooseImg"><text class="iconfont icon-jia"></text></button>
 			</view>
-			<view class="location align-center">
-				<text class="iconfont icon-dingwei"></text>{{city}}·{{place}}
+			<view class="location align-center" @click="chooseLocation" v-show="addressName">
+				<text class="iconfont icon-dingwei"></text>{{addressName}}
 			</view>
 			<view class="pay-on-wall">
 				<view class="choose-pay align-center">
@@ -29,35 +30,158 @@
 				<button type="primary" class="fr" @click="submit">发布</button>
 			</view>
 		</view>
+		<view class="open-setting-modal" v-if="openSetting">
+			<view class="content">
+				<view class="border-bt-1px">"慧景链"即将打开设置页，请您在设置页选择允许使用位置信息</view>
+				<button type="default" open-type="openSetting" @opensetting="handleSetting">确定</button>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
+	import amap from '@/utils/amap-wx.js';  
 	import previewImg from '@/components/preview-img/index.vue'
+	import navBar from '@/components/nav-bar/index.vue'
 	export default {
 		data() {
 			return {
+				headerTitle: '打卡留言',
+				openSetting: false,
 				comment: '',
 				imgs: [],
-				city: '重庆',
-				place: 'xxx',
+				addressName:'', //定位地址
+				latitude: '',		//纬度
+				longitude: '',  //经度
 				pay: false,
 				duration: '',
 				money: 0,
-				switch: false
+				switch: false,
 			}
 		},
 		components: {
-			previewImg
+			previewImg,
+			navBar
 		},
-		onLoad(options) {
-			uni.setNavigationBarTitle({
-				title: options.name
-			})
-			this.queryId = options.id
-			this.queryName = options.name
+		onShow() {
+			uni.hideTabBar()
+			if (!this.addressName) {
+				this.amapPlugin = new amap.AMapWX({
+						key: "6e567d4324ae2efdba7f37b02a30a719" 
+				});
+				this.getAuthSetting()
+			}
+		},
+		computed: {
+			queryName() {
+				console.log(this.$store.state.punchName,999888777)
+				return this.$store.state.punchName
+			}
 		},
 		methods: {
+			//回到首页，同时清空数据
+			handleBack() {
+				console.log('进入')
+				uni.switchTab({
+					url: '/pages/home/index',
+					success:() => {
+						console.log('完成')
+						//置空定位，下次进入页面重新重新定位
+						this.addressName = ''
+						this.cancelAuth = false
+						this.$store.commit('setPunchName', '')
+						uni.showTabBar()
+					}
+				})
+			},
+			//获取定位授权情况，已授权
+			getAuthSetting() {
+				uni.getSetting({
+					success:(res) => {
+						console.log(res, 798,this.cancelAuth)
+						if (res.authSetting['scope.userLocation']===false) {
+							if (!this.cancelAuth) {
+								this.showAuthModal()
+							}
+						} else {
+							this.getLocation()
+						}
+					}
+				})
+			},
+			//获取定位
+			getLocation() {
+				uni.getLocation({
+					type: 'gcj02',
+					success:(res) => {
+						console.log(res, 'getLocation-success')
+						uni.showLoading({
+								title: '获取定位中'  
+						});  
+						this.latitude = res.latitude
+						this.longitude = res.longitude
+						this.amapPlugin.getRegeo({
+								success: (data) => {
+									console.log(data, 'getRegeo')
+									/* const res = data[0].regeocodeData.addressComponent
+									this.city = res.province //省
+									const city = res.city || '' //市
+									const district = res.district	//区
+									const street = res.streetNumber.street + res.streetNumber.number //街道
+									this.place = city + district + street */
+									this.addressName = data[0].name;
+									uni.hideLoading();  
+								},
+								fail(e) {
+								}
+						});
+					},
+					fail:(e) => {
+						console.log(e, 'getLocation-fail')
+					}
+				})
+			},
+			//授权定位提示
+			showAuthModal() {
+				uni.showModal({
+					title: "请开启定位",
+					content: '请允许"慧景链"使用您的定位，方便为您提供更好服务。',
+					confirmText: "开启定位",
+					confirmColor: "#3CC51F",
+					success:(res) => {
+						console.log(res, 'res')
+						if (res.confirm) {
+							this.openSetting = true
+						} else {
+							this.cancelAuth = true
+						}
+					}
+				})
+			},
+			//设置回调
+			handleSetting(e) {
+				this.openSetting = false
+				console.log(e, 465)
+				if (e.detail.authSetting['scope.userLocation']) {
+					this.getLocation()
+				} else {
+					this.cancelAuth = true
+				}
+			},
+			//打开地图选择定位
+			chooseLocation() {
+				uni.chooseLocation({
+					success: (res) => {
+						console.log(res, 'choose')
+						this.addressName = res.name
+						this.latitude = res.latitude
+						this.longitude = res.longitude
+					},
+					fail: (e) => {
+						console.log(e, 'chooseFail')
+					}
+				})
+			},
 			chooseImg() {
 				uni.chooseImage({
 					sourceType: ['album'],
@@ -82,7 +206,7 @@
 			},
 			submit() {
 				uni.navigateTo({
-					url:`/pages/payInfo/index?id=${this.queryId}&name=${this.queryName}`,
+					url:`/pages/payInfo/index?name=${this.queryName}`,
 				})
 			}
 		}
@@ -91,8 +215,11 @@
 
 <style lang="less">
 	.punch-page{
+		.punch-content {
+			padding: 15rpx 30rpx 0;
+		}
 		.comment-input {
-			margin: 50rpx 0 15rpx;
+			margin-bottom: 15rpx;
 			font-size: 30rpx;;
 			line-height: 44rpx;
 			padding-left: 0;
@@ -175,6 +302,34 @@
 				margin-top: 45rpx;
 				border-radius: 60rpx;
 				font-size: 26rpx;
+			}
+		}
+		.open-setting-modal {
+			position: absolute;
+			top: 0;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background-color: rgba(0,0,0,0.6);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			.content {
+				width: 520rpx;
+				background-color: #fff;
+				border-radius: 20rpx;
+				overflow: hidden;
+				view {
+					padding: 28rpx 40rpx;
+				}
+				button {
+					background-color: #fff;
+					color: #e64340;
+					line-height: 2.2;
+					&::after {
+						border: none;
+					}
+				}
 			}
 		}
 	}

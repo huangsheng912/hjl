@@ -1,7 +1,6 @@
 <template>
 	<view class="punch-detail">
 		<sight-item :sightInfo="sightInfo" isDetail @toFriendCircle="toFriendCircle"></sight-item>
-		<view class="">{{time1}}--{{time2}}</view>
 		<view class="comment-list pd-lr-15">
 			<view class="comment-item flex" v-for="item in comments" :key="item.id">
 				<image :src="item.avatar" mode="" class="avatar"></image>
@@ -31,8 +30,6 @@
 			:imgSrc="sightInfo.imgList"
 			QrSrc="../../static/img/qrCode.jpg"
 			@success="generateSuccess"
-			@img1="c"
-			@img2="cc"
 		></share-poster>
 	</view>
 </template>
@@ -45,9 +42,7 @@
 			return {
 				sightInfo:{},
 				comments: [],
-				cWidth: 375,
-				time1: '',
-				time2:""
+				cWidth: 375
 			}
 		},
 		components: {
@@ -73,14 +68,6 @@
 			}
 		},
 		methods: {
-			c(e) {
-				this.time1=e
-				console.log(e,'c')
-			},
-			cc(e) {
-				this.time2 = e
-				console.log(e,'cc')
-			},
 			getPunchDetail(id) {
 				const userInfo = uni.getStorageSync('userInfo')
 				this.userInfo = userInfo

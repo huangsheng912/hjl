@@ -121,8 +121,9 @@
 		methods:{
 			toUrl() {
 				console.log(this.queryName,this.queryId,444)
-				uni.navigateTo({
-					url:`/pages/punch/index?id=${this.queryId}&name=${this.queryName}`,
+				this.$store.commit('setPunchName', this.queryName,)
+				uni.switchTab({
+					url: '/pages/punch/index'
 				})
 			}
 		}

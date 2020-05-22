@@ -1,6 +1,0 @@
-{
-  "navigationBarTitleText": "热门景区",
-  "usingComponents": {
-    "area-search": "/components/area-search/index"
-  }
-}

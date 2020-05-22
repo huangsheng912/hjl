@@ -46,7 +46,6 @@
 			</view>
 			<view class="tip">慧景链申请获取你的用户信息</view>
 			<operate-button type="auth" @getUserInfo="getUserInfo">授权登录</operate-button>
-			<!-- <button type="primary" open-type="getUserInfo" @getuserinfo="getUserInfo">授权登录</button> -->
 		</view>
 		
 	</view>

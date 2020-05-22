@@ -152,7 +152,6 @@
 						width = 0
 					} else {
 						const index = i-(line-1)*3
-						console.log(index, i,999)
 						x = this.canvasPadding + imgWidth*index + marginRight*index
 						width+=x
 					}
@@ -165,7 +164,6 @@
 			async drawQrCode() {
 				const imgWidth = uni.upx2px(180)
 				const x = (this.canvasWidth - imgWidth)/2
-				console.log(this.cHeight, '---cHeight')
 				const y = this.cHeight
 				const src = await this.getImageInfo(this.QrSrc)
 				//TODO
@@ -183,10 +181,10 @@
 				return new Promise((resolve, reject) => {
 					uni.getImageInfo({
 						src: imgSrc,
-						success(image) {
+						success:(image) => {
 							resolve(image.path);
 						},
-						fail(err) {
+						fail:(err) => {
 							reject(err);
 						}
 					})
@@ -194,7 +192,6 @@
 			},
 			//将画布内容导出为图片
 			getNewImage(){
-				console.log(1324657777,this.CanvasID)
 				uni.canvasToTempFilePath({
 					canvasId: this.CanvasID,
 					quality: 1,
