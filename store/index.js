@@ -5,18 +5,19 @@ Vue.use(Vuex)
 
 const store = new Vuex.Store({
 	state:{
-		location: null,//定位信息
-		openid: '',  //openid
 		userInfo: uni.getStorageSync('userInfo') || {},
-		punchName: ''
+		punchInfo: {},
+		currentSightId: ''
 	},
 	mutations: {
 		setUserInfo(state, data) {
-			console.log(data, 7897987)
 			state.userInfo = data
 		},
-		setPunchName(state, data) {
-			state.punchName = data
+		setPunchInfo(state, data) {
+			state.punchInfo = data
+		},
+		setCurrentSightId(state, data) {
+			state.currentSightId = data
 		}
 	},
 	actions: {

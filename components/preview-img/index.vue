@@ -1,6 +1,7 @@
 <template>
 	<view class="preview-wrap" @click="previewImg">
 		<image :src="url" mode="scaleToFill"></image>
+		<slot></slot>
 	</view>
 </template>
 
@@ -33,8 +34,10 @@
 
 <style lang="less" scoped>
 	.preview-wrap {
-		width: 195rpx;
-		height: 195rpx;
+		width: 215rpx;
+		height: 215rpx;
+		margin-right: 20rpx;
+		margin-bottom: 20rpx;
 		border-radius: 10rpx;
 		overflow: hidden;
 		image {

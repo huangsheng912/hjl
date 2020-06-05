@@ -21,7 +21,7 @@
 			</swiper>
 		</view>
 		<view class="quick-entry">
-			<view class="entry-item">
+			<view class="entry-item" @click="scanCode">
 				<view class="img-wrap">
 					<image src="../../static/img/punch.png" mode=""></image>
 				</view>
@@ -52,31 +52,42 @@
 				<sight-item :sightInfo="item" share ></sight-item>
 			</block>
 		</view>
+		<load-more :status="status" v-if="sights.length"></load-more>
+		<view class="no-data" v-else>暂无数据</view>
 	</view>
 </template>
 
 <script>
 	import areaSearch from '@/components/area-search/index.vue'
 	import sightItem from '@/components/sight-item/index.vue'
+	import loadMore from '@/components/load-more/index.vue'
+	import { rPost } from '@/utils/http.js'
 	export default {
 		data() {
+			this.pageNumber = 0
+			this.pageSize = 5
+			this.total = 0
+			this.searchVal = ''
+			this.provinceCode = ''
 			return {
-				sights: []
+				sights: [],
+				status: 'more'
 			}
 		},
 		components:{
 			areaSearch,
 			sightItem,
+			loadMore
 		},
 		onShareAppMessage(res) {
 			console.log(res,'===res')
 			if (res.from === 'button') {// 来自页面内分享按钮
 				const shareInfo = res.target.dataset.info
-				const desc = shareInfo.desc
+				const desc = shareInfo.content
 				const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
 				return {
 					title,
-					imageUrl: shareInfo.imgList[0],
+					imageUrl: shareInfo.pictures[0],
 					path: `/pages/punchDetail/index?id=${shareInfo.id}`
 				}
 			} else {
@@ -87,104 +98,114 @@
 				}
 			}
 		},
-		created() {
+		//下拉刷新
+		onPullDownRefresh() {
+			this.clear()
+			this.getPunchingList()
+		},
+		//上拉加载更多
+		onReachBottom() {
+			if ((this.pageNumber+1) * this.pageSize < this.total) {
+				this.pageNumber++
+				this.status = 'loading'
+				this.getPunchingList()
+			}
+		},
+		onShow() {
+			this.updatePunchingList()
+			uni.showTabBar()
+		},
+		onLoad() {
+			this.getBanner()
 			this.getPunchingList()
 		},
 		methods: {
-			getPunchingList() {
-				const userInfo = uni.getStorageSync('userInfo')
-				this.userInfo = userInfo
+			//轮播图
+			async getBanner() {
+				const res = await rPost('', 'getBanner',{})
+			},
+			//正在打卡
+			async getPunchingList() {
+				const params = {
+				 "pageNumber": this.pageNumber,
+					"pageSize": this.pageSize,
+					"scenicId": "",
+					"placeId": "",
+					"wxUserId": "",
+					"provinceCode": this.provinceCode,
+					"cityCode": "",
+					"searchText": this.searchVal
+				}
 				uni.showLoading({
 					title: '加载中...',
 					mask: true
 				})
-				setTimeout(()=>{
-					this.sights = [
-						{
-							id:1,
-							avatar: userInfo.avatarUrl,
-							name: userInfo.nickName,
-							time: '2020-04-13',
-							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-							imgList: [
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005141542597627.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_2020051901022499206.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062123407084.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153383899.jpg',
-							],
-							like: 236,
-							comments: 222,
-							city: '丽江市',
-							place: '玉龙雪山'
-						},
-						{
-							id:2,
-							avatar: userInfo.avatarUrl,
-							name: userInfo.nickName,
-							time: '2020-04-13',
-							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-							imgList: [
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
-							],
-							like: 26,
-							comments: 22,
-							city: '丽江市',
-							place: '玉龙雪山'
-						},
-						{
-							id:3,
-							avatar: userInfo.avatarUrl,
-							name: userInfo.nickName,
-							time: '2020-04-13',
-							desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-							imgList: [
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-								'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-								'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
-							],
-							like: 234,
-							comments: 223,
-							city: '丽江市',
-							place: '玉龙雪山'
-						}
-					]
-					uni.hideLoading()
-				},1500)
+				const res = await rPost('', 'wordsPageList',params)
+				if (res.result) {
+					const list = res.result.list
+					list.map(v => {
+						v.createDate = v.createDate.split(' ')[0]
+					})
+					this.total = res.result.totalCount
+					if ((this.pageNumber+1) * this.pageSize < this.total) {
+						this.status = 'more'
+					} else {
+						this.status = 'no-more'
+					}
+					this.sights = this.sights.concat(list)
+				}
+				uni.hideLoading()
+				uni.stopPullDownRefresh()
+			},
+			//从详情回来更新该条信息的评论和点赞
+			async updatePunchingList() {
+				const id = this.$store.state.currentSightId
+				if(id) {
+					const params = {
+					 "pageNumber": 0,
+						"pageSize": (this.pageNumber +1) *this.pageSize,
+						"scenicId": "",
+						"placeId": "",
+						"wxUserId": "",
+						"provinceCode": this.provinceCode,
+						"cityCode": "",
+						"searchText": this.searchVal
+					}
+					const res = await rPost('', 'wordsPageList',params)
+					if (res.result) {
+						const list = res.result.list
+						list.map((v,i) => {
+							v.createDate = v.createDate.split(' ')[0]
+							if (id === v.id) {
+								this.sights.splice(i, 1 , v)
+							}
+						})
+					}
+				}
 			},
 			changeArea(e) {
 				console.log(e)
-				
+				this.provinceCode = e.code
+				this.searchVal = e.val
+				this.clear()
+				this.getPunchingList()
 			},
-			shareByButton() {
-				return new Promise((resolve, reject) => {
-					setTimeout(()=>{
-						const desc = this.shareInfo.desc
-						const title = desc.length > 16 ? desc.substring(0,16)+'...' : desc
-						const result = {
-							title,
-							path: `/pages/punchDetail/index?id=${this.shareInfo.id}`,
-							imageUrl: this.shareInfo.imgList[0]
-						}
-						resolve(result)
-					},500)
-				})
+			//重置查询条件
+			clear() {
+				this.pageNumber = 0
+				this.total = 0
+				this.sights = []
+			},
+			scanCode() {
+				uni.scanCode({
+				    success: function (res) {
+							console.log(res,'5444')
+				    }
+				});
 			},
 			toUrl(path) {
 				uni.navigateTo({
 					url:`/pages/${path}/index`,
-				})
-			},
-			toDetail(id, name) {
-				uni.navigateTo({
-					url:`/pages/sightsDetail/index?id=${id}&name=${name}`,
 				})
 			}
 		}
@@ -245,12 +266,6 @@
 				}
 			}
 			preview-img {
-				/deep/.preview-wrap {
-					width: 215rpx;
-					height: 215rpx;
-					margin-right: 20rpx;
-					margin-bottom: 20rpx;
-				}
 				&:nth-of-type(3n) /deep/ .preview-wrap {
 					margin-right: 0
 				}

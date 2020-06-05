@@ -12,21 +12,50 @@
 </template>
 
 <script>
+	import province from './province-city'
+	const pData = {}
+	province.map(v => {
+		pData[v.name] = v.code
+		const citys = v.cityList
+		if (citys.length) {
+			citys.map(city => {
+				pData[city.name] = city.code
+			})
+		}
+	})
+	uni.setStorageSync('province', JSON.stringify(pData))
+	
 	export default {
 		data() {
 			return {
 				currentArea: 0, //当前选中地区
-				areaArr: [{name: '全球'},{name:'中国'}, {name:'美国'}, {name:'巴西'}, {name:'日本'}],
+				areaArr: [{name: '全国', code: ''}],
 				searchVal: ''
 			}
 		},
+		created() {
+			province.map(v => {
+				this.areaArr.push({
+					name: v.name,
+					code: v.code
+				})
+			})
+		},
 		methods: {
 			selectArea(e) {
+				console.log(e, '8888')
 				this.currentArea = e.detail.value
-				this.$emit('change', e)
+				this.$emit('change', {
+					code: this.areaArr[e.detail.value].code,
+					val: this.searchVal
+				})
 			},
 			search() {
 				console.log(this.searchVal)
+				this.$emit('change', {
+					code: this.areaArr[this.currentArea].code,
+					val: this.searchVal
+				})
 			}
 		}
 	}

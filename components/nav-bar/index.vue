@@ -41,7 +41,7 @@
 			line-height: 44px;
 			text-align: center;
 			background-color: #fff;
-			font-size: 14px;
+			font-size: 15px;
 			.left {
 				position: absolute;
 				left: 10px;

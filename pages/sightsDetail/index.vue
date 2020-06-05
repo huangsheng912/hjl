@@ -2,16 +2,18 @@
 	<view class="sights-detail bg-common">
 		<view class="sight-info bg-white pd-lr-15">
 			<view class="fw">景点简介</view>
-			<view class="desc">前端运行日志，请另行在小程序开发工具的控制台查看前端运行日志，请另行在小程序开发工具的控制台查看前端运行日志，请另行在小程序开发工具的控制台查看。前端运行日志，请另行在小程序开发工具的控制台查看。</view>
-			<image class="sight-img" src="../../static/img/me-bg.png" mode="scaleToFill"></image>
-			<view class="desc">前端运行日志，请另行在小程序开发工具的控制台查看前端运行日志，请另行在小程序开发工具的控制台查看前端运行日志，请另行在小程序开发工具的控制台查看。前端运行日志，请另行在小程序开发工具的控制台查看。</view>
-			<image class="sight-img" src="../../static/img/me-bg.png" mode="scaleToFill"></image>
+			<rich-text :nodes="html"></rich-text>
+			<!-- <jyf-parser :html="html" ref="article"></jyf-parser>
+			<view class="desc">{{sightInfo.introduce}}</view>
+			<image class="sight-img" :src="sightInfo.pictures[0]" mode="scaleToFill"></image>
+			<view class="desc"></view> -->
 		</view>
 		<view class="sight-comment">
 			<view class="fw bg-white border-bt-1px">评论</view>
 			<block v-for="item in comments" :key="item.time">
 				<sight-item :sightInfo="item" share :location="false"></sight-item>
 			</block>
+			<view class="no-data bg-white" v-if="!comments.length">暂无数据</view>
 		</view>
 		<view class="punch flex" @click="toUrl">
 			<text class="iconfont icon-pinglun"></text>
@@ -23,16 +25,22 @@
 <script>
 	import previewImg from '@/components/preview-img/index.vue'
 	import sightItem from '@/components/sight-item/index.vue'
+	import {rPost} from '@/utils/http.js'
+	// import jyfParser from "@/components/jyf-parser/jyf-parser.vue"
 	export default {
 		data() {
 			return {
+				sightInfo: {},
+				html: '',
 				userInfo: '',
 				comments: []
 			}
 		},
 		components: {
 			previewImg,
-			sightItem
+			sightItem,
+			
+			// jyfParser
 		},
 		onShareAppMessage(res) {
 			console.log(res,'===res')
@@ -60,68 +68,38 @@
 			})
 			this.queryId = options.id
 			this.queryName = options.name
-		},
-		created() {
-			console.log(this.queryId, 'queryId')
-			const userInfo = uni.getStorageSync('userInfo')
-			this.userInfo = userInfo
-			this.comments = [
-				{
-					avatar: userInfo.avatarUrl,
-					name: userInfo.nickName,
-					time: '2020-04-13',
-					desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-					imgList: [
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-						'http://pic.5tu.cn/uploads/allimg/201508/010P0000240Y4Z6091-1.jpg',
-					],
-					like: 236,
-					comments: 222,
-					city: 132
-				},
-				{
-					avatar: userInfo.avatarUrl,
-					name: userInfo.nickName,
-					time: '2020-04-12',
-					desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-					imgList: [
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153427549.jpg',
-					],
-					like: 236,
-					comments: 222,
-				},
-				{
-					avatar: userInfo.avatarUrl,
-					name: userInfo.nickName,
-					time: '2020-04-12',
-					desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-					imgList: [],
-					like: 236,
-					comments: 222,
-				},
-				{
-					avatar: userInfo.avatarUrl,
-					name: userInfo.nickName,
-					time: '2020-04-11',
-					desc: '请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志请另行在小程序开发工具的控制台查看前端运行日志,请另行在小程序开发工具的控制台查看前端运行日志',
-					imgList: [
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005062122536742.jpg',
-						'http://pic.5tu.cn/uploads/allimg/202005/pic_5tu_thumb_202005022153402869.jpg',
-					],
-					like: 236,
-					comments: 222,
-				},
-				
-			]
+			this.getSightInfo()
+			this.addViewTimes()
 		},
 		methods:{
+			//增加浏览次数
+			addViewTimes() {
+				rPost('', 'recordViews', {scenicId: this.queryId})
+			},
+			async getSightInfo() {
+				uni.showLoading({
+					title: '加载中...',
+					mask: true
+				})
+				const params = {
+				 id: this.queryId,
+				}
+				const res = await rPost('', 'getPlaceById', params)
+				if (res.result) {
+					this.html = res.result.introduce
+					this.sightInfo = res.result
+				}
+				uni.hideLoading()
+			},
 			toUrl() {
 				console.log(this.queryName,this.queryId,444)
-				this.$store.commit('setPunchName', this.queryName,)
+				const info = {
+					name: this.queryName,
+					id: this.queryId,
+					provinceName: this.sightInfo.provinceName,
+					cityName: this.sightInfo.cityName
+				}
+				this.$store.commit('setPunchInfo', info)
 				uni.switchTab({
 					url: '/pages/punch/index'
 				})
@@ -163,12 +141,6 @@
 				}
 			}
 			preview-img {
-				/deep/.preview-wrap {
-					width: 215rpx;
-					height: 215rpx;
-					margin-right: 20rpx;
-					margin-bottom: 20rpx;
-				}
 				&:nth-of-type(3n) /deep/ .preview-wrap {
 					margin-right: 0
 				}
@@ -182,6 +154,10 @@
 						margin-right: 15rpx;
 					}
 				}
+			}
+			.no-data {
+				margin: 0;
+				padding: 40rpx 0;
 			}
 		}
 		.comment-bottom {

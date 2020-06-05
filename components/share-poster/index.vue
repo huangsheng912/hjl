@@ -56,8 +56,8 @@
 				this.ctx = uni.createCanvasContext(this.CanvasID,this) //创建canvas绘图上下文
 				this.canvasWidth = this.cWidth //canvas宽度
 				this.canvasW = this.canvasWidth
-				const line = Math.floor(this.imgSrc.length/3)
-				this.canvasH = uni.upx2px(800)+uni.upx2px(215)*line
+				const line = Math.ceil(this.imgSrc.length/3)
+				this.canvasH = uni.upx2px(600)+uni.upx2px(215)*line
 				this.canvasPadding = uni.upx2px(30); //canvas Paddng 间距
 				this.contentWidth = this.canvasWidth - this.canvasPadding*2
 				this.cHeight = uni.upx2px(60)  //绘制内容距顶部高度
@@ -165,12 +165,13 @@
 				const imgWidth = uni.upx2px(180)
 				const x = (this.canvasWidth - imgWidth)/2
 				const y = this.cHeight
-				const src = await this.getImageInfo(this.QrSrc)
+				const localSrc = await this.base64ToImg(this.QrSrc)
+				const src = await this.getImageInfo(localSrc)
 				//TODO
-				this.drawCircleImg(x,y,imgWidth/2, this.QrSrc)
+				this.drawCircleImg(x,y,imgWidth/2, src)
 				this.ctx.font=`normal normal ${uni.upx2px(24)}px serial`
 				this.ctx.setFillStyle('#8e939c'); //设置标题文本颜色
-				this.ctx.fillText('长按可识别小程序码', uni.upx2px(270), this.cHeight+imgWidth+uni.upx2px(30));
+				this.ctx.fillText('长按可识别小程序码', uni.upx2px(270), this.cHeight+imgWidth+uni.upx2px(40));
 				this.ctx.draw(true,(ret)=>{
 					uni.hideLoading();
 					this.getNewImage()
@@ -203,6 +204,36 @@
 						this.$emit('success',res.tempFilePath);
 					}
 				},this);
+			},
+			//base64转本地图片
+			base64ToImg(base64data) {
+				const fsm = wx.getFileSystemManager();
+				const FILE_NAME = 'base64src';
+				return new Promise((resolve, reject) => {
+						//解析base64，提取出图片类型: imgtype,解析内容bodyData（去掉data:image/png;base64,以后的内容）
+					const [, imgType, bodyData] = /data:image\/(\w+);base64,(.*)/.exec(base64data) || [];
+					if (!imgType) {
+							reject(new Error('ERROR_BASE64SRC_PARSE'));
+					}
+					/**
+					 *wx.env.USER_DATA_PATH
+					 *本地用户文件
+					 *本地用户文件是从 1.7.0 版本开始新增的概念。提供了一个用户文件目录给开发者，开发者对这个目录有完全自由的读写权限。通过 wx.env.USER_DATA_PATH 可以获取到这个目录的路径。
+					 */
+					const filePath = `${wx.env.USER_DATA_PATH}/${FILE_NAME}.${imgType}`;
+					//按指定写入文件的字符编码encoding，向地址filepath，写入数据data。
+					fsm.writeFile({
+							filePath,
+							data: bodyData,
+							encoding: 'base64',
+							success() {
+									resolve(filePath);
+							},
+							fail() {
+									reject(new Error('ERROR_BASE64SRC_WRITE'));
+							},
+					});
+				});
 			}
 		}
 	}

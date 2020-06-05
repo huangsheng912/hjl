@@ -1,28 +1,28 @@
 <template>
-	<view class="common-sight-item" v-show="sightInfo.time">
+	<view class="common-sight-item" v-show="sightInfo.createDate">
 		<view class="user-info flex">
-			<image class="user-avatar" :src="sightInfo.avatar" mode="scaleToFill"></image>
-			<view class="info">
-				<view class="user-name">{{sightInfo.name}}</view>
-				<text class="time">{{sightInfo.time}}</text>
+			<image class="user-avatar" :src="sightInfo.wxUserImg" mode="scaleToFill"></image>
+			<view class="info" @click="toPunchDetail(sightInfo.id)">
+				<view class="user-name">{{sightInfo.wxNickName}}</view>
+				<text class="time">{{sightInfo.createDate}}</text>
 			</view>
 			<operate-button v-if="share" :shareItem="sightInfo"><text class="iconfont icon-fenxiang"></text>分享</operate-button>
 		</view>
-		<view class="comment-desc" @click="toPunchDetail(sightInfo.id)">{{sightInfo.desc}}</view>
+		<view class="comment-desc" @click="toPunchDetail(sightInfo.id)">{{sightInfo.content}}</view>
 		<view class="comment-imgs border-bt-1px">
-			<preview-img :url="img" :urlList="sightInfo.imgList"  v-for="img in sightInfo.imgList" :key="img"></preview-img>
+			<preview-img :url="img" :urlList="sightInfo.pictures"  v-for="img in sightInfo.pictures" :key="img"></preview-img>
 		</view>
 		<view class="comment-bottom">
-			<view class="location fl" v-if="location">
-				<text class="iconfont icon-dingwei"></text>{{sightInfo.city}}·{{sightInfo.place}}
+			<view class="location fl" v-if="location" @click="showMap">
+				<text class="iconfont icon-dingwei"></text>{{sightInfo.punchPointName || sightInfo.scenicName}}
 			</view>
-			<view class="fr">
-				<text class="iconfont icon-heart-fill"></text>
-				{{sightInfo.like}}
+			<view class="fr" @click="changeLike">
+				<text class="iconfont" :class="ilike?'icon-heart-fill':'icon-heart'"></text>
+				{{formatNum(likes)}}
 			</view>
 			<view class="fr">
 				<text class="iconfont icon-pinglun1"></text>
-				{{sightInfo.comments}}
+				{{formatNum(sightInfo.comments)}}
 			</view>
 		</view>
 		<view class="share-wrap" v-if="isDetail">
@@ -40,6 +40,8 @@
 <script>
 	import operateButton from '@/components/operate-button/index.vue'
 	import previewImg from '@/components/preview-img/index.vue'
+	import { rPost } from '@/utils/http.js' 
+	import { formatNum } from '@/utils/util.js'
 	export default {
 		props: {
 			sightInfo:{
@@ -63,7 +65,31 @@
 			operateButton,
 			previewImg
 		},
+		data() {
+			return {
+				ilike: false,
+				likes: 0
+			}
+		},
+		watch:{
+			'sightInfo': {
+				immediate: true,
+				handler: function(){
+					this.ilike = this.sightInfo.ilike
+					this.likes = this.sightInfo.likes
+				}
+				
+			}
+		},
 		methods: {
+			formatNum(num) {
+				return formatNum(num)
+			},
+			changeLike() {
+				this.likes = this.ilike ? this.likes-1 : this.likes +1
+				this.ilike = !this.ilike
+				rPost('', 'changeLike', {wordsId: this.sightInfo.id})
+			},
 			handleShare() {
 				console.log(this, 777888)
 				this.$parent.shareInfo = this.sightInfo
@@ -73,9 +99,23 @@
 				this.$emit('toFriendCircle', this.sightInfo)
 			},
 			toPunchDetail(id) {
+				this.$store.commit('setCurrentSightId', id)
 				uni.navigateTo({
 					url:`/pages/punchDetail/index?id=${id}`,
 				})
+			},
+			showMap() {
+				const info = this.sightInfo
+				const name = info.punchPointName || info.scenicName
+				uni.openLocation({
+						latitude: info.latitude,
+						longitude: info.longitude,
+						name: name,
+						address: info.cityName + name,
+						success: function (res) {
+								console.log('success'+res);
+						}
+				});
 			}
 		}
 	}
@@ -156,8 +196,10 @@
 			.iconfont {
 				margin-right: 8rpx;
 			}
-			.icon-heart-fill {
+			.icon-heart-fill,.icon-heart {
 				margin-left: 30rpx;
+			}
+			.icon-heart-fill {
 				color: #fa6464;
 			}
 		}

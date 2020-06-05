@@ -8,17 +8,50 @@ export function post(url, data) {
 	return request(url, data, 'POST')
 }
 
+export function rPost(url, method, data=[]) {
+	const params = {
+		jsonrpc: "2.0",
+		method: method,
+		params: data,
+		id: Math.floor(Math.random()*1000)
+	}
+	return request(url, params, 'POST')
+}
+
+export function upload(url,filePath, name='file') {
+	return new Promise((resolve,reject) => {
+		uni.uploadFile({
+			url: config.base_url + url,
+			header: {
+				'content-type': 'multipart/form-data'
+			},
+			filePath,
+			name,
+			success: (res) => {
+				resolve(res.data)
+			},
+			fail: (err) => {
+				reject(err)
+				showError(err.message)
+			}
+		})
+	})
+}
+
 function request(url, data, method='GET') {
 	return new Promise((resolve,reject) => {
 		uni.request({
 			url: config.base_url + url,
 			header: {
 				'content-type': 'application/json',
-				'token': uni.getStorageSync('token')
+				'Session-Key': uni.getStorageSync('token')
 			},
 			method,
 			data,
 			success: (res) => {
+				if (res.data.error && res.data.error === -32001) {
+					
+				}
 				resolve(res.data)
 			},
 			fail: (err) => {
