@@ -1,0 +1,117 @@
+{
+	"pages": [ //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
+		{
+			"path": "pages/home/index",
+			"style": {
+				"navigationBarTitleText": "首页",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/hotSights/index",
+			"style": {
+				"navigationBarTitleText": "热门景区",
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/sightsDetail/index",
+			"style": {
+				"navigationBarTitleText": "景区详情",
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/punchDetail/index",
+			"style": {
+				"navigationBarTitleText": "打卡详情",
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/comment-detail/index",
+			"style": {
+				"navigationBarTitleText": "评论",
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/punch/index",
+			"style": {
+				"navigationBarTitleText": "打卡留言",
+				"navigationStyle":"custom"
+			}
+		},
+		{
+			"path": "pages/payInfo/index",
+			"style": {
+				"navigationBarTitleText": "支付信息"
+			}
+		},
+		{
+			"path": "pages/me/index",
+			"style": {
+				"navigationBarTitleText": "我的",
+				"navigationStyle":"custom",
+				"enablePullDownRefresh": true,
+				"onReachBottomDistance": 50
+			}
+		},
+		{
+			"path": "pages/login/index",
+			"style": {
+				"navigationBarTitleText": "登录"
+				
+			}
+		}
+	],
+	"globalStyle": {
+		"navigationBarTextStyle": "black",
+		"navigationBarTitleText": "慧景链",
+		"navigationBarBackgroundColor": "#fff",
+		"backgroundColor": "#fff"
+	},
+	"tabBar": {
+		"color": "#000",
+		"selectedColor": "#71dbe0",
+		"borderStyle": "black",
+		"backgroundColor": "#fff",
+		"fontSize": "22px",
+		"list": [{
+				"pagePath": "pages/home/index",
+				"iconPath": "static/img/home.png",
+				"selectedIconPath": "static/img/homeActive.png",
+				"text": "首页"
+			},
+			{
+				"pagePath": "pages/punch/index",
+				"iconPath": "static/img/footPrint.png",
+				"selectedIconPath": "static/img/footPrintActive.png",
+				"text": "打卡"
+			}, {
+				"pagePath": "pages/me/index",
+				"iconPath": "static/img/me.png",
+				"selectedIconPath": "static/img/meActive.png",
+				"text": "我的"
+			}
+		]
+	},
+	"condition": { //模式配置，仅开发期间生效
+	    "current": 2, //当前激活的模式（list 的索引项）
+	    "list": [{
+					"name": "me",
+					"path": "pages/me/index"
+				},
+				{
+					"name": "detail",
+					"path": "pages/sightsDetail/index"
+				},
+				{
+					"name": "punchDetail",
+					"path": "pages/punchDetail/index",
+					"query":"id=2d8dc4bd82f8448384fa0b3127dcb128"
+				}
+	    ]
+	}
+}
