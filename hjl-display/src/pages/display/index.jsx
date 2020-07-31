@@ -1,10 +1,14 @@
 import React, {Component} from 'react';
 import './index.less'
 import {post} from "utils/request";
-import axios from 'axios'
+
 const trackHeight = 80 //单条弹幕高度
 class Display extends Component {
+  state = {
+    scenicName: ''
+  }
   page = 0
+  totalPage = 0
   tracks = []
   componentDidMount() {
     const wrapper = document.getElementById('wrapper')
@@ -15,24 +19,25 @@ class Display extends Component {
     this.getDisplayData()
     let timer = setInterval(()=>{
       if (this.page >= this.totalPage) {
-        clearInterval(timer)
-        return
+        const hasDisplayItem = wrapper.hasChildNodes()
+        if (!hasDisplayItem) {
+          this.page = 0
+          this.getDisplayData()
+        }
+       /* clearInterval(timer)
+        return*/
+      } else {
+        this.getDisplayData()
       }
-      this.getDisplayData()
     },5000)
   }
-  testHttp() {
-    axios.get('http://127.0.0.1:7001/user').then(res=>{
 
-    }).catch(e=>{
-
-    })
-  }
   async getDisplayData() {
+    const scenicId = sessionStorage.getItem('scenicId')
     const params = {
       "pageNumber": this.page++,
       "pageSize": 10,
-      "scenicId": "",
+      "scenicId": scenicId,
       "placeId": "",
       "wxUserId": "",
       "provinceCode": "",
@@ -44,6 +49,9 @@ class Display extends Component {
     if (res.result) {
       this.totalPage = res.result.totalPage
       const data = res.result.list
+      this.setState({
+        scenicName: data[0].scenicName
+      })
       for(let v of data) {
         await this._render(v)
       }
@@ -118,7 +126,7 @@ class Display extends Component {
         clear(timer)
         wrapper.removeChild(dom)
       } else {
-        dom.style.left = (offsetLeft - speed)+'px'
+        dom.style.left = (offsetLeft - speed) + 'px'
         timer = rAF(move)
       }
     }
@@ -132,15 +140,23 @@ class Display extends Component {
   }
   render() {
     const token = sessionStorage.getItem('tokenId')
+    const scenicId = sessionStorage.getItem('scenicId')
     if (!token) {
       this.props.history.push('/login')
       return null
     }
     return (
       <div className='display-page' >
-        {/*<button onClick={()=>this.testHttp()}>测试egg发送请求</button>*/}
-        <h3>XXX景点</h3>
-        <div id='wrapper'></div>
+        {
+          scenicId ?
+            ( <>
+                <h3>{this.state.scenicName}</h3>
+                <div id='wrapper'></div>
+              </>
+            ) :
+            null
+        }
+
       </div>
     );
   }

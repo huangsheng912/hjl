@@ -12,7 +12,7 @@ class AddressModal extends Component {
     })
   }
   onRowClick = (v) => {
-    console.log(v,'----addressInfo----')
+    // console.log(v,'----addressInfo----')
     this.props.selectAddress(v)
     this.visible()
   }

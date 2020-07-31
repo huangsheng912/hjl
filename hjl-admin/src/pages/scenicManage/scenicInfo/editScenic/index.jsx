@@ -70,7 +70,7 @@ class Main extends React.Component {
   componentDidMount() {
     const id = getQuery('id')
     const edit = getQuery('edit')
-    console.log(id ,edit, 897999)
+    // console.log(id ,edit, 897999)
     if (id) {
       this.getInfo(id)
       if (!edit) {
@@ -79,7 +79,7 @@ class Main extends React.Component {
         })
       }
     }
-    console.log(this.props, '==props')
+    // console.log(this.props, '==props')
   }
   async getInfo(id) {
     const res = await post('', 'getScenicInfo', {scenicId: id})
@@ -97,7 +97,7 @@ class Main extends React.Component {
   }
 
   beforeUpload = (file, name) => {
-    console.log(file, name,55)
+    // console.log(file, name,55)
     this.myUpload(file,name)
     return false
   }
@@ -118,14 +118,11 @@ class Main extends React.Component {
   }
   //预览图片
   previewImage = (pics, index) =>{
-    console.log(1)
     const images = pics.map(pic=>({src: pic}))
     this.setState({
       previewImgs: images,
       activeIndex: index,
       visible: true
-    },()=>{
-      console.log(this.state.previewImgs)
     })
 
   }
@@ -146,7 +143,7 @@ class Main extends React.Component {
   handleSubmit = e => {
     e.preventDefault();
     this.props.form.validateFieldsAndScroll((err, values) => {
-      console.log(values, '=====valus',this.editor.editor.txt.html(),11,this.editor.editor.txt.text())
+      // console.log(values, '=====valus',this.editor.editor.txt.html(),11,this.editor.editor.txt.text())
       if (this.editor.editor.txt.text()) {
         this.setState({
           showEditorError: false

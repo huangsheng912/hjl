@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import {Redirect} from 'react-router-dom'
 import './index.less'
-import {Form, Input, Button, Icon, message} from "antd";
+import {Form, Input, Button, Icon, message, Radio} from "antd";
 import {post} from "utils/request";
 import {observer,inject} from "mobx-react";
 
@@ -32,7 +32,7 @@ class Login extends Component {
     validateFields( async err=>{
       if (!err) {
         const userInfo = getFieldsValue();
-        const data = {type:'sys',...userInfo}
+        const data = userInfo
         const res = await post('','login',data);
         if (res.result) {
           const data = res.result
@@ -45,7 +45,9 @@ class Login extends Component {
             userName: data.userName,
             nickName: data.userName,
             tokenId: data.sessionKey,
-            userId: data.id
+            userId: data.id,
+            scenicId: data.scenicId,
+            role: userInfo.type, //sys系统管理员，scenic景区管理员
           };
           this.props.configStore.changeConfig(configInfo) //会触发render中的redirect 不需再手动跳转路由
           /*const state = this.props.location.state || {}
@@ -89,6 +91,17 @@ class Login extends Component {
                 type="password"
                 placeholder="密码"
               />,
+            )}
+          </Form.Item>
+          <Form.Item className="role-select">
+            {getFieldDecorator('type', {
+              rules: [{ required: true, message: '请选择账号角色' }],
+              initialValue: 'sys',
+            })(
+              <Radio.Group>
+                <Radio value="sys">系统管理员</Radio>
+                <Radio value="scenic">景区管理员</Radio>
+              </Radio.Group>,
             )}
           </Form.Item>
           {/*<p className="tr">*/}

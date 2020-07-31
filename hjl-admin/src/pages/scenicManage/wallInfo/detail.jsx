@@ -14,7 +14,6 @@ class Main extends React.Component {
     page: 0
   }
   componentDidMount() {
-    console.log(this.props.location,'--ppp')
     this.getTotal();
     this.getList()
   }
@@ -65,7 +64,7 @@ class Main extends React.Component {
   }
   //下拉回调
   handleChange(v,type) {
-    console.log(v,111,type)
+    // console.log(v,111,type)
     this.setState({
       [type]:v
     })

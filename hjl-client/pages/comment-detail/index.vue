@@ -104,6 +104,11 @@
 					this.pageNumber = 0
 					this.comments = []
 					this.getComments(this.id,this.preId)
+				} else {
+					uni.showToast({
+						title: '评论失败： '+res.message,
+						icon: 'none',
+					})
 				}
 			}
 		}

@@ -28,7 +28,11 @@ export function upload(url,filePath, name='file') {
 			filePath,
 			name,
 			success: (res) => {
-				resolve(res.data)
+				if (res.data.error) {
+					resolve(res.data.error)
+				} else {
+					resolve(res.data)
+				}
 			},
 			fail: (err) => {
 				reject(err)
@@ -49,10 +53,11 @@ function request(url, data, method='GET') {
 			method,
 			data,
 			success: (res) => {
-				if (res.data.error && res.data.error === -32001) {
-					
+				if (res.data.error) {
+					resolve(res.data.error)
+				} else {
+					resolve(res.data)
 				}
-				resolve(res.data)
 			},
 			fail: (err) => {
 				reject(err)

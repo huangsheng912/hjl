@@ -191,6 +191,12 @@
 					this.pageNumber = 0
 					this.comments = []
 					this.getComments(this.sightInfo.id)
+				} else {
+					// console.log(res, '=====res====')
+					uni.showToast({
+						title: '评论失败： '+res.message,
+						icon: 'none',
+					})
 				}
 			},
 			toUrl(item) {

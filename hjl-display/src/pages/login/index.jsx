@@ -28,11 +28,12 @@ class Login extends Component {
     validateFields( async err=>{
       if (!err) {
         const userInfo = getFieldsValue();
-        const data = {type:'sys',...userInfo}
+        const data = {type:'scenic', ...userInfo}
         const res = await post('','login',data);
         if (res.result) {
           const data = res.result
           sessionStorage.setItem('tokenId', data.sessionKey)
+          sessionStorage.setItem('scenicId', data.scenicId)
           this.props.history.push('/')
         } else {
           message.error(res.msg)

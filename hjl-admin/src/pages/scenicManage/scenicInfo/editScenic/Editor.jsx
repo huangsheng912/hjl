@@ -22,7 +22,7 @@ class Editor extends React.Component {
     editor.customConfig.uploadImgMaxLength = 1;
     editor.customConfig.customUploadImg = async (files, insert) => {
       // files 是 input 中选中的文件列表
-      console.log(files);
+      // console.log(files);
       if (files[0]) {
         const url = await this.handleUpload(files[0]);
         if (url) {

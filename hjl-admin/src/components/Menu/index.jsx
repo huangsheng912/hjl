@@ -126,8 +126,10 @@ class RenderRoute extends React.Component {
     return true
   }
   renderRoute = (config) => {
+    const { role } = this.props
     return config.map(v => {
       if (!v.children) {
+        if (v.role.indexOf(role)<0) return null
         const LoadableBar = Loadable({
           loader: () => import("../../pages" + v.value),
           loading() {
@@ -231,7 +233,9 @@ class MenuBar extends React.Component {
   };
   //渲染侧边菜单
   renderMenuItem = (config) => {
+    const { role } = this.props.configStore.configInfo
     return config.map(v => {
+      if (v.role.indexOf(role)<0) return null
       if (!v.children) {
         if (v.detail) return null
         return <Menu.Item key={v.value}>
@@ -382,6 +386,7 @@ class MenuBar extends React.Component {
             <Content>
               <RenderRoute config={this.menuConfig}
                            currentPath={selectKey}
+                           role={configInfo.role}
                            redirectPath={this.getDefaultRoute(this.menuConfig)}
               />
             </Content>

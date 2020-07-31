@@ -299,6 +299,11 @@
 									const response = JSON.parse(res)
 									if (response.result) {
 										this.imgs.push(response.result.url)
+									} else {
+										uni.showToast({
+											title: '上传图片失败: '+res.message,
+											icon: 'none'
+										})
 									}
 								} catch(e) {
 									// console.log(e,'====error=====')
@@ -388,8 +393,9 @@
 						this.handleBack('me')
 					}
 				} else {
+					// console.log(res,'=====res====')
 					uni.showToast({
-						title: '打卡失败',
+						title: '打卡失败: '+res.message,
 						icon: 'none'
 					})
 				}
@@ -416,8 +422,9 @@
 				if (res.result) {
 					this.handleBack('me')
 				} else {
+					console.log(res,'=====res====')
 					uni.showToast({
-						title: '打卡失败',
+						title: '打卡失败: '+res.message,
 						icon: 'none'
 					})
 				}

@@ -1,7 +1,7 @@
 import React from 'react'
 import './index.less';
 import {post} from 'utils/request'
-import {Button, DatePicker} from "antd";
+import {Button, DatePicker, Input, Modal, Select, Tooltip} from "antd";
 import moment from "moment";
 import Table from "components/Table";
 import {observer, inject} from "mobx-react";
@@ -11,38 +11,90 @@ const configInfo = JSON.parse(localStorage.getItem('configInfo')) || {};
 
 @inject('configStore')
 @observer
-class Main extends React.Component {
+class WallInfo extends React.Component {
   state = {
     tableLoading: true,
-    page: 0
+    pageNumber: 0,
+    pageSize: 10,
+    total: 0,
+    list: [],
+    scenicList: [],
+    placeList: [],
+    scenicId:'',
+    placeId:'',
+    searchText:''
   }
 
   componentDidMount() {
     this.getList()
+    // this.getScenic()
+    this.getPlaceList()
   }
 
-
-
+  //留言列表
   async getList() {
-    const params = {
-      placeId:''
-    }
-    const res = await post('', 'getDisplay', params);
-    if (res.success) {
-
+    const { scenicId } = this.props.configStore.configInfo
+    if (!scenicId) {
+      this.setState({
+        tableLoading: false
+      })
+    } else {
+      this.setState({
+        tableLoading: true
+      })
+      const {pageNumber, pageSize, placeId, searchText} = this.state
+      const params = {
+        pageNumber,
+        pageSize,
+        scenicId,
+        placeId,
+        wxUserId: "",
+        searchText,
+        provinceCode: "",
+        cityCode: ""
+      }
+      const res = await post('', 'wordsPageList', params);
+      if (res.result) {
+        this.setState({
+          tableLoading: false,
+          list: res.result.list,
+          total: res.result.totalCount
+        })
+      }
     }
   }
 
-  onTimeChange = (value, dateString) => {
-    console.log(value[0].$d.getTime(), 'time')
-    console.log('Selected Time: ', value);
-    console.log('Formatted Selected Time: ', dateString);
-    const start = value[0].$d.getTime()
-    const end = value[1].$d.getTime()
-    this.setState({
-      start,
-      end
-    })
+  //获取所有景区
+  async getScenic() {
+    const params = {
+      pageNumber: 0,
+      pageSize: 100
+    }
+    const res = await post('', 'scenicPageList', params);
+    if (res.result) {
+      this.setState({
+        scenicList: [...res.result.list]
+      },this.getPlaceList)
+    }
+  }
+
+  //打卡点
+  async getPlaceList(){
+    const params = {
+      pageNumber: 0,
+      pageSize: 100,
+      scenicId: ''
+    }
+    const res = await post('', 'placePageList', params);
+    if (res.result) {
+      /*res.result.list.map(v=>{
+        const scenic = this.state.scenicList.filter(scenic=>v.scenicId === scenic.id)[0]
+        v.scenicName = scenic ? scenic.scenicName : ''
+      })*/
+      this.setState({
+        placeList: res.result.list
+      })
+    }
   }
 
   //列表查询
@@ -53,55 +105,58 @@ class Main extends React.Component {
     }, this.getList)
   }
   //分页
-  changeSize = (page, size) => {
+  changeSize = (pageNumber, pageSize) => {
     this.setState({
-      tableLoading: true,
-      page
+      pageNumber
     }, this.getList)
   }
   toDetail = (id) => {
-    this.props.configStore.changeRoute('/dashBoard/rewardDistribution/detail?id='+id);
-    this.props.history.push({
-      pathname: '/dashBoard/rewardDistribution/detail',
-      /*query: {
-        id: 456
-      },*/
-      search: '?id=' + id
-    })
+
   }
 
   render() {
-    const {usdi, nuls, list = [], total, tableLoading,page} = this.state;
+    const { scenicList, placeList, list, total, tableLoading, pageNumber, pageSize, searchText } = this.state;
     const columns = [
       {
         key: 'index',
         dataIndex: 'index',
         title: '编号',
         render: (text, row, index) => {
-          return (index+1) + this.state.pageNumber*this.state.pageSize
+          return (index+1) + pageNumber*pageSize
         }
       },
       {
-        key: 'info',
-        dataIndex: 'info',
-        title: '上墙内容'
+        key: 'content',
+        dataIndex: 'content',
+        title: '上墙内容',
+        render: (text) => {
+          if (text.length> 30) {
+            return (
+              <Tooltip title={text} getPopupContainer={()=>this.wrap}>
+                <span>{text.substring(0,30)+'...'}</span>
+              </Tooltip>
+            )
+          } else {
+            return text
+          }
+        }
       },
       {
-        key: 'belongScenic',
-        dataIndex: 'belongScenic',
-        title: '所属景区'
+        key: 'scenicName',
+        dataIndex: 'scenicName',
+        title: '所属景区',
       },
       {
-        key: 'belongPlace',
-        dataIndex: 'belongPlace',
-        title: '所属景点'
+        key: 'placeName',
+        dataIndex: 'placeName',
+        title: '所属景点',
       },
       {
-        key: 'userName',
-        dataIndex: 'userName',
+        key: 'wxNickName',
+        dataIndex: 'wxNickName',
         title: '用户名'
       },
-      {
+      /*{
         key: 'time',
         dataIndex: 'time',
         title: '上墙时间'
@@ -121,15 +176,12 @@ class Main extends React.Component {
         dataIndex: 'operate',
         title: '操作',
         render: (text, record) => <a onClick={() => this.toDetail(record.date)}>屏蔽</a>
-      },
+      },*/
     ]
     return (
-      <div className='redemption-page'>
-        <div className="table-search">
-
-        </div>
+      <div className='wall-info' ref={v=>this.wrap=v}>
         <div className="bg-white">
-          <div className='list-search hidden'>
+          {/*<div className='list-search hidden'>
             <div className='fl'>
               日期范围&nbsp;&nbsp;&nbsp;
               <RangePicker
@@ -143,6 +195,29 @@ class Main extends React.Component {
               <Button type='primary' onClick={this.doSearch}>查询</Button>
             </div>
 
+          </div>*/}
+          <div className='list-search hidden'>
+            {/*<div className='fl'>
+              景区&nbsp;&nbsp;&nbsp;
+              <Select defaultValue='' allowClear onChange={(v)=>this.setState({scenicId: v||''})}>
+                {scenicList.map(scenic=><Option key={scenic.id} value={scenic.id}>{scenic.scenicName}</Option>)}
+              </Select>
+            </div>*/}
+            <div className='fl'>
+              景点&nbsp;&nbsp;&nbsp;
+              <Select defaultValue='' allowClear onChange={(v)=>this.setState({placeId: v||''})}>
+                {placeList.map(scenic=><Option key={scenic.id} value={scenic.id}>{scenic.name}</Option>)}
+              </Select>
+            </div>
+
+            <div className='fl'>
+              <Input className='search-input' placeholder='请输入留言信息'
+                     value={searchText}
+                     onChange={(e)=>this.setState({searchText: e.target.value})} />
+            </div>
+            <div className='fl'>
+              <Button type='primary' onClick={this.doSearch}>查询</Button>
+            </div>
           </div>
           <Table
             columns={columns}
@@ -150,7 +225,7 @@ class Main extends React.Component {
             loading={tableLoading}
             total={total}
             changeSize={this.changeSize}
-            currentPage={page}
+            currentPage={pageNumber}
           />
         </div>
       </div>
@@ -158,4 +233,4 @@ class Main extends React.Component {
   }
 }
 
-export default Main
+export default WallInfo

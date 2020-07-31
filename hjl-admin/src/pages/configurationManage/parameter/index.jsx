@@ -63,7 +63,7 @@ class Main extends React.Component {
   doSave = () => {
     const obj = {...this.state.parameters}
     obj.SYFFPCValue = moment(obj.SYFFPCValue).format('HH:mm')
-    console.log(this.state,'---obj',obj)
+    // console.log(this.state,'---obj',obj)
   }
   render() {
     const {disabled,parameters={}} = this.state

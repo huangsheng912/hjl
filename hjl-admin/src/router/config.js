@@ -34,6 +34,7 @@ const config = [
     title: '景区管理',
     icon: 'control',
     value:'scenicManage',
+    role: ['scenic', 'sys'],
     children:[
       /*{
         title: '景区数据',
@@ -48,48 +49,56 @@ const config = [
       {
         title: '景区信息',
         value: '/scenicManage/scenicInfo',
-        component: ScenicInfo
+        component: ScenicInfo,
+        role: ['scenic', 'sys']
       },
       {
         title: '新增景区',
         value: '/scenicManage/scenicInfo/addScenic',
         detail: true,
-        component: AddScenic
+        component: AddScenic,
+        role: 'scenic'
       },
       {
         title: '编辑景区',
         value: '/scenicManage/scenicInfo/editScenic',
         detail: true,
-        component: EditScenic
+        component: EditScenic,
+        role: 'scenic'
       },
       {
         title: '审核景区',
         value: '/scenicManage/scenicInfo/auditScenic',
         detail: true,
-        component: AuditScenic
+        component: AuditScenic,
+        role: 'sys'
       },
       {
         title: '打卡点管理',
         value: '/scenicManage/punchPoint',
-        component: PunchPoint
+        component: PunchPoint,
+        role: 'scenic'
       },
       {
         title: '新增打卡点',
         value: '/scenicManage/punchPoint/addPunchPoint',
         detail: true,
-        component: AddPunchPoint
+        component: AddPunchPoint,
+        role: 'scenic'
       },
       {
         title: '编辑打卡点',
         value: '/scenicManage/punchPoint/editPunchPoint',
         detail: true,
-        component: EditPunchPoint
+        component: EditPunchPoint,
+        role: 'scenic'
       },
-      /*{
+      {
         title: '上墙信息',
         value: '/scenicManage/wallInfo',
-        component: WallInfo
-      }*/
+        component: WallInfo,
+        role: 'scenic'
+      }
     ]
   },
   /*{
@@ -113,11 +122,13 @@ const config = [
     title: '系统管理',
     icon: 'setting',
     value:'systemManage',
+    role: 'sys',
     children:[
       {
         title: '账号管理',
         value: '/systemManage/accountManage',
-        component: AccountManage
+        component: AccountManage,
+        role: 'sys',
       },
       /*{
         title: '系统设置',

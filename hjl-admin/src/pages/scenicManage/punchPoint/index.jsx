@@ -4,48 +4,53 @@ import {post} from 'utils/request'
 import {Button, Divider, Input, message, Select} from "antd";
 import moment from "moment";
 import Table from "components/Table";
+import {inject, observer} from "mobx-react";
 
 const {Option} = Select
 
-const configInfo = JSON.parse(localStorage.getItem('configInfo')) || {};
-class Main extends React.Component {
+@inject('configStore')
+@observer
+class PunchPoint extends React.Component {
   state={
     tableLoading: true,
     pageNumber: 0,
     pageSize: 10,
     total: 0,
-    scenicId: '',
     scenicList: [{scenicName: '全部',id: ''}],
     list: [],
     totalPlace: 0
   }
   async componentDidMount() {
-    await this.getScenic()
+    // await this.getScenic()
     await this.getList()
   }
 
   //打卡点
   async getList(){
-    this.setState({
-      tableLoading: true
-    })
-    const {pageNumber, pageSize, scenicId} = this.state
-    const res = await post('', 'placePageList', {pageNumber, pageSize, scenicId});
-    if (res.result) {
-      if (pageNumber === 0) {
+    const { scenicId } = this.props.configStore.configInfo
+    if (!scenicId) {
+      this.setState({
+        tableLoading: false
+      })
+    } else {
+      const {pageNumber, pageSize} = this.state
+      const res = await post('', 'placePageList', {pageNumber, pageSize, scenicId});
+      if (res.result) {
+        if (pageNumber === 0) {
+          this.setState({
+            totalPlace: res.result.totalCount
+          })
+        }
+        res.result.list.map(v=>{
+          const scenic = this.state.scenicList.filter(scenic=>v.scenicId === scenic.id)[0]
+          v.scenicName = scenic ? scenic.scenicName : ''
+        })
         this.setState({
-          totalPlace: res.result.totalCount
+          tableLoading: false,
+          total: res.result.totalCount,
+          list: res.result.list
         })
       }
-      res.result.list.map(v=>{
-        const scenic = this.state.scenicList.filter(scenic=>v.scenicId === scenic.id)[0]
-        v.scenicName = scenic ? scenic.scenicName : ''
-      })
-      this.setState({
-        tableLoading: false,
-        total: res.result.totalCount,
-        list: res.result.list
-      })
     }
   }
 
@@ -59,14 +64,12 @@ class Main extends React.Component {
     if (res.result) {
       this.setState({
         scenicList: [...this.state.scenicList, ...res.result.list]
-      },()=>{
-        console.log(this.state.scenicList,11)
       })
     }
   }
 
   handleChange = (id) => {
-    console.log(id)
+    // console.log(id)
     this.setState({
       scenicId: id
     })
@@ -171,7 +174,7 @@ class Main extends React.Component {
           </div>
         </div>
         <div className="bg-white">
-          <div className='list-search hidden'>
+          {/*<div className='list-search hidden'>
             <div className='fl'>
               所属景区&nbsp;&nbsp;&nbsp;
               <Select defaultValue='' onChange={(v)=>this.handleChange(v,'orderState')}>
@@ -181,7 +184,7 @@ class Main extends React.Component {
             <div className='fr'>
               <Button type='primary' onClick={()=>this.getList()}>查询</Button>
             </div>
-          </div>
+          </div>*/}
           <Table
             columns={columns}
             dataSource={list}
@@ -196,4 +199,4 @@ class Main extends React.Component {
   }
 }
 
-export default Main
+export default PunchPoint

@@ -4,37 +4,62 @@ import {post} from 'utils/request'
 import {Button, Input, Select, Modal, message, Divider} from "antd";
 import moment from "moment";
 import Table from "components/Table";
+import {inject, observer} from "mobx-react";
 
 const {Option} = Select
 const { confirm } = Modal;
 
-const configInfo = JSON.parse(localStorage.getItem('configInfo')) || {};
-
-class Main extends React.Component {
+@inject('configStore')
+@observer
+class ScenicInfo extends React.Component {
   state={
     tableLoading: true,
-    totalScenic: 0, //景区总数
+    list: [],
     pageNumber: 0,
     pageSize: 10,
-    count:0
+    total: 0,
+    canCreateScenic: false
   }
   componentDidMount() {
     this.getList()
   }
 
   async getList(){
-    const params = {
-      pageNumber: this.state.pageNumber,
-      pageSize: this.state.pageSize,
+    const { scenicId, role } = this.props.configStore.configInfo
+    let method, params
+    if (role === 'scenic') {
+      if (scenicId) {
+        method = 'getScenicInfo'
+        params = {scenicId}
+      } else {
+        this.setState({
+          tableLoading: false,
+          canCreateScenic: true
+        })
+        return null
+      }
+    } else {
+      method = 'scenicPageList'
+      params = {
+        pageNumber: this.state.pageNumber,
+        pageSize: this.state.pageSize,
+      }
     }
-    const res = await post('', 'scenicPageList', params);
+    const res = await post('', method, params);
     if (res.result) {
-
-      this.setState({
-        tableLoading: false,
-        total: res.result.totalCount,
-        list:  res.result.list
-      })
+      if (scenicId) {
+        this.setState({
+          tableLoading: false,
+          total: 1,
+          list:  [res.result]
+        })
+      } else {
+        this.setState({
+          tableLoading: false,
+          total: res.result.totalCount,
+          list:  res.result.list
+        })
+      }
     }
   }
   //添加、编辑、审核景区
@@ -43,7 +68,7 @@ class Main extends React.Component {
   }
   //下拉回调
   handleChange(v,type) {
-    console.log(v,111,type)
+    // console.log(v,111,type)
     this.setState({
       [type]:v
     })
@@ -78,17 +103,8 @@ class Main extends React.Component {
     this.props.history.push('/scenicManage/scenicInfo/auditScenic?id='+id)
   }
   render() {
-    const {totalScenic,redeem,key,list=[],total,tableLoading,pageNumber} = this.state;
-
-    const orderStateType=[
-      {label:'全部',value:''},
-      {label:'处理中',value:'Process'},
-      {label:'已通知转账',value:'NotifyTransfer'},
-      {label:'转账中',value:'Transfer'},
-      {label:'确认中',value:'Confirming'},
-      {label:'已完成',value:'Complete'},
-      {label:'失败',value:'Fail'},
-    ];
+    const { list, total, tableLoading, pageNumber, canCreateScenic} = this.state;
+    const {scenicId, role} = this.props.configStore.configInfo
     const columns=[
       {
         title: '序号',
@@ -129,39 +145,47 @@ class Main extends React.Component {
         dataIndex: 'status',
         key: 'status',
         render: (text,item)=> {
-          if (text === '0') {
-            //未入驻
-            return (
-              <span>
+          if (role === 'sys') {
+            if (text === '1') {
+              return (
+                <span>
+                  <a onClick={()=>this.audit(item.id)}>审核</a>
+                </span>
+              )
+            } else {
+              return null
+            }
+          } else {
+            if (text === '0') {
+              //未入驻
+              return (
+                <span>
                  <a onClick={()=>showModal('new',item.id)}>申请入驻</a>
                  <Divider type="vertical" />
                  <a onClick={()=>this.toEdit(item.id)}>编辑</a>
               </span>
-            )
-          } else if (text === '1') {
-            return (
-              <span>
-                <a onClick={()=>this.audit(item.id)}>审核</a>
-              </span>
-            )
-          } else if (text === '2') {
-            //运营中
-            return (
-              <span>
+              )
+            } else if (text === '2') {
+              //运营中
+              return (
+                <span>
                 <a onClick={()=>this.toEdit(item.id)}>编辑</a>
-                {/*<Divider type="vertical" />
+                  {/*<Divider type="vertical" />
                 <a onClick={()=>this.addPunchPoint(item.id)}>添加打卡点</a>*/}
               </span>
-            )
-          } else if (text === '3') {
-            //驳回
-            return (
-              <span>
+              )
+            } else if (text === '3') {
+              //驳回
+              return (
+                <span>
                 <a onClick={()=>showModal('old',item.id)}>重新申请</a>
                 <Divider type="vertical" />
                 <a onClick={()=>this.toEdit(item.id)}>编辑</a>
               </span>
-            )
+              )
+            } else {
+              return null
+            }
           }
         }
       }
@@ -194,14 +218,12 @@ class Main extends React.Component {
     }
     return (
       <div className='scenic-info-page'>
-        {/*4545
-        <Button onClick={()=>this.setState({count:this.state.count+1})}>{this.state.count}</Button>*/}
-        <div className="table-search">
+         <div className="table-search">
           <span className='search-label'>景区总数：{total}</span>
-          <span className='search-label'>打卡地址数：{redeem}</span>
-          <div className='fr'>
+          <span className='search-label'>打卡地址数：</span>
+           {canCreateScenic &&<div className='fr'>
             <Button type='primary' onClick={()=>this.addScenic()}>新增景区</Button>
-          </div>
+          </div>}
         </div>
         <div className='bg-white'>
           {/*<div className='list-search hidden'>
@@ -235,4 +257,4 @@ class Main extends React.Component {
   }
 }
 
-export default Main
+export default ScenicInfo

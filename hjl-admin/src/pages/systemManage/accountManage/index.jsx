@@ -21,10 +21,14 @@ class Main extends React.Component {
     startTime: '',
     endTime: '',
     search: '',
-    editId: '' //编辑用户id
+    editId: '', //编辑用户id
+    scenicList: [],
+    scenicId: '',
+    visible: false
   }
   componentDidMount() {
     this.getList()
+    this.getScenic()
   }
   async getList() {
     this.setState({
@@ -47,6 +51,19 @@ class Main extends React.Component {
       })
     }
   }
+  //获取所有景区
+  async getScenic() {
+    const params = {
+      pageNumber: 0,
+      pageSize: 100
+    }
+    const res = await post('', 'scenicPageList', params);
+    if (res.result) {
+      this.setState({
+        scenicList: [...res.result.list]
+      })
+    }
+  }
   //下拉回调
   handleChange = (v) => {
     this.setState({
@@ -65,8 +82,8 @@ class Main extends React.Component {
         endTime: ''
       })
     }
-    console.log('Selected Time: ', value);
-    console.log('Formatted Selected Time: ', dateString);
+    // console.log('Selected Time: ', value);
+    // console.log('Formatted Selected Time: ', dateString);
   }
   //查询
   doSearch = () => {
@@ -104,7 +121,7 @@ class Main extends React.Component {
   }
   //新建、编辑用户确认回调
   changeUserInfo = (userInfo) => {
-    console.log(userInfo,'---userInfo')
+    // console.log(userInfo,'---userInfo')
     this.setState({
       pageNumber: 0,
       status:'',
@@ -132,7 +149,7 @@ class Main extends React.Component {
     if (res.result) {
       message.success('重置成功')
       const myId = this.props.configStore.configInfo.userId
-      if (id === myId) {
+      if (record.id === myId) {
         this.props.configStore.clearLoginInfo()
         this.props.history.push('/login')
       }
@@ -186,7 +203,7 @@ class Main extends React.Component {
     if (res.result) {
       message.success('设置成功')
       const myId = this.props.configStore.configInfo.userId
-      if (id === myId) {
+      if (record.id === myId) {
         this.props.configStore.clearLoginInfo()
         this.props.history.push('/login')
       } else {
@@ -194,7 +211,24 @@ class Main extends React.Component {
       }
     }
   }
-  logout = async () => {
+  //设置景区管理员弹窗
+  setScenicAdmin = (record) => {
+    // console.log(record,'===record')
+    this.setState({
+      visible: true
+    })
+    this.chooseUser = record.id
+  }
+  //设置景区管理员
+  async setCallBack() {
+    // console.log(this.chooseUser,'-=-=-=-',this.chooseScenic)
+    const res = await post('', 'markScenicAdmin', {id: this.chooseUser, scenicId: this.chooseScenic});
+    if (res.result) {
+      message.success('设置成功')
+      this.getList()
+    }
+  }
+  /*logout = async () => {
     const myId = this.props.configStore.configInfo.userId
     if (id === myId) {
       this.props.configStore.clearLoginInfo()
@@ -202,9 +236,9 @@ class Main extends React.Component {
     } else {
       this.getList()
     }
-  }
+  }*/
   render() {
-    const {searchVal,tableList,total,loading,modalTitle, pageNumber, editId } = this.state;
+    const {search, tableList, total, loading, modalTitle, pageNumber, editId, visible, scenicList, scenicId } = this.state;
     const statusType=[{label:'全部',value:''},{label:'启用',value: 0},{label:'禁用',value: 1}];
     const columns = [
       {
@@ -232,6 +266,21 @@ class Main extends React.Component {
         key:'createDate',
         dataIndex:'createDate',
         render: (text)=>moment(text).format('YYYY-MM-DD HH:mm:ss')
+      },
+      {
+        title:'所属景区',
+        key:'scenicId',
+        dataIndex:'scenicId',
+        render: (text,record)=>{
+          const scenic = scenicList.filter(v=>text === v.id)[0]
+          if (scenic) {
+            return scenic.scenicName
+          } else {
+            return (
+              <a onClick={()=>this.setScenicAdmin(record)}>设置</a>
+            )
+          }
+        }
       },
       {
         title:'是否管理员',
@@ -266,7 +315,7 @@ class Main extends React.Component {
         <div className='search-account hidden'>
           <div className='fl'>
             状态&nbsp;&nbsp;&nbsp;
-            <Select defaultValue='All' onChange={this.handleChange}>
+            <Select defaultValue='' onChange={this.handleChange}>
               {
                 statusType.map(v=><Option key={v.value} value={v.value}>{v.label}</Option>)
               }
@@ -282,7 +331,9 @@ class Main extends React.Component {
             />
           </div>
           <div className='fl'>
-            <Input className='search-input' placeholder='请输入用户名、姓名、手机号查询' value={searchVal}/>
+            <Input className='search-input' placeholder='请输入用户名、姓名、手机号查询'
+                   value={search}
+                   onChange={(e)=>this.setState({search: e.target.value})} />
           </div>
           <div className='fl'>
             <Button type='primary' onClick={this.doSearch}>查询</Button>
@@ -302,6 +353,18 @@ class Main extends React.Component {
           submit={this.changeUserInfo}
           id={editId}
         />
+        <Modal
+          className="set-scenic-modal"
+          title="设置景区管理员"
+          visible={visible}
+          onOk={()=>this.setCallBack()}
+          onCancel={()=>this.setState({visible: false})}
+        >
+          所属景区&nbsp;&nbsp;&nbsp;
+          <Select defaultValue='' onChange={(v)=>this.chooseScenic=v}>
+            {scenicList.map(scenic=><Option key={scenic.id} value={scenic.id}>{scenic.scenicName}</Option>)}
+          </Select>
+        </Modal>
       </div>
     )
   }

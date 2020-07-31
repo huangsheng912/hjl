@@ -54,12 +54,12 @@
 		},
 		methods: {
 			showInput() {
-				this.commentWords = ''
+				// this.commentWords = ''
 				this.showCommentInput = true
 				this.focus = true
 			},
 			closeInput() {
-				this.commentWords = ''
+				// this.commentWords = ''
 				this.showCommentInput = false
 				this.$emit('cancelReply')
 			},
@@ -80,7 +80,7 @@
 					this.showCommentInput = false
 					const words = this.commentWords
 					this.$emit('sendComment', words)
-					this.commentWords = ''
+					// this.commentWords = ''
 				}
 			},
 			focusComment(e) {

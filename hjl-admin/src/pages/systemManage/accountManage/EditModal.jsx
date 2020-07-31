@@ -22,7 +22,7 @@ class EditModal extends Component {
   }
   submit = () => {
     const {validateFields, getFieldsValue} = this.props.form;
-    console.log(this.props,88)
+    // console.log(this.props,88)
     validateFields( async err=>{
       if (!err) {
         const userInfo = getFieldsValue()
@@ -48,7 +48,6 @@ class EditModal extends Component {
           this.setState({
             confirmLoading: false
           })
-          console.log(e,23456)
         }
       }
     })
@@ -94,6 +93,7 @@ class EditModal extends Component {
       <Modal
         title={this.props.title}
         visible={this.state.show}
+        maskClosable={false}
         onOk={this.submit}
         onCancel={this.visible}
         confirmLoading={this.state.confirmLoading}
