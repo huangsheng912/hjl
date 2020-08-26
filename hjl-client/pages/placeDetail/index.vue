@@ -1,7 +1,7 @@
 <template>
-	<view class="sights-detail bg-common bg-white pd-lr-15">
-		<view class="sight-info">
-			<view class="fw">景区简介</view>
+	<view class="place-detail bg-common">
+		<view class="place-info bg-white pd-lr-15">
+			<view class="fw">景点简介</view>
 			<jyf-parser ref='article'></jyf-parser>
 			<!-- <rich-text :nodes="html"></rich-text> -->
 			<!-- <jyf-parser :html="html" ref="article"></jyf-parser>
@@ -9,19 +9,7 @@
 			<image class="sight-img" :src="sightInfo.pictures[0]" mode="scaleToFill"></image>
 			<view class="desc"></view> -->
 		</view>
-		<view class="fw">打卡景点</view>
-		<view v-if="places.length">
-			<view class="place-list" v-for="item in places" :key="item.id" >
-				<image :src="item.pictures[0]" mode=""></image>
-				<view class="place-info flex">
-					<view class="info-title" @click="toDetail(item.id,item.name)">{{item.name}}</view>
-					<view class="info-desc" @click="toDetail(item.id,item.name)">{{item.introduce}}</view>
-				</view>
-			</view>
-			<load-more :status="status"></load-more>
-		</view>
-		<view v-else class="no-data">暂无打卡景点</view>
-		<!-- <view class="sight-comment">
+		<view class="place-comment">
 			<view class="fw bg-white border-bt-1px">留言</view>
 			<block v-for="item in comments" :key="item.time">
 				<sight-item :sightInfo="item" share :location="false"></sight-item>
@@ -32,7 +20,7 @@
 		<view class="punch flex" @click="toUrl">
 			<text class="iconfont icon-pinglun"></text>
 			打卡留言
-		</view> -->
+			</view>
 	</view>
 </template>
 
@@ -52,8 +40,7 @@
 				html: '',
 				userInfo: '',
 				comments: [],
-				status: 'more',
-				places: []
+				status: 'more'
 			}
 		},
 		components: {
@@ -76,7 +63,7 @@
 			} else {
 				return {
 					title: '慧景链',
-					path: `/pages/sightsDetail/index?id=${this.queryId}&name=${this.queryName}`,
+					path: `/pages/placeDetail/index?id=${this.queryId}&name=${this.queryName}`,
 					// imageUrl: '../../static/img/integral.png'
 				}
 			}
@@ -86,7 +73,7 @@
 			if ((this.pageNumber+1) * this.pageSize < this.total) {
 				this.pageNumber++
 				this.status = 'loading'
-				this.placePageList()
+				this.getWordsPageList()
 			}
 		},
 		onLoad(options) {
@@ -97,19 +84,18 @@
 			this.queryId = options.id
 			this.queryName = options.name
 			this.getSightInfo()
-			this.placePageList()
+			this.getWordsPageList()
 		},
 		methods:{
-			//景区信息
 			async getSightInfo() {
 				uni.showLoading({
 					title: '加载中...',
 					mask: true
 				})
 				const params = {
-				 scenicId: this.queryId,
+				 id: this.queryId,
 				}
-				const res = await rPost('', 'getScenicInfo', params)
+				const res = await rPost('', 'getPlaceById', params)
 				if (res.result) {
 					this.html = res.result.introduce
 					this.$refs.article.setContent(res.result.introduce);
@@ -117,40 +103,55 @@
 				}
 				uni.hideLoading()
 			},
-			//景区下景点列表
-			async placePageList() {
+			async getWordsPageList() {
 				const params = {
 					pageNumber: this.pageNumber,
 					pageSize: this.pageSize,
-					scenicId: this.queryId,
+					scenicId: '',
+					placeId: this.queryId,
+					wxUserId: '',
+					searchText: '',
+					provinceCode: '',
+					cityCode: ''
 				}
-				const res = await rPost('', 'placePageList', params)
+				const res = await rPost('', 'wordsPageList', params)
 				if (res.result) {
+					const list = res.result.list
+					list.map(v => {
+						v.createDate = v.createDate.split(' ')[0]
+					})
 					this.total = res.result.totalCount
 					if ((this.pageNumber+1) * this.pageSize < this.total) {
 						this.status = 'more'
 					} else {
 						this.status = 'no-more'
 					}
-					res.result.list.map(v=>{
-						v.introduce = v.introduce.replace(/<\/?.+?>/g, "")
-					})
-					this.places = this.places.concat(res.result.list)
+					this.comments = this.comments.concat(list)
 				}
 			},
-			toDetail(id, name) {
-				uni.navigateTo({
-					url:`/pages/placeDetail/index?id=${id}&name=${name}`,
+			toUrl() {
+				// console.log(this.queryName,this.queryId,444,this.sightInfo)
+				const {name, id ,address} = this.sightInfo
+				const info = {
+					name,
+					id,
+					address,
+					provinceName: this.sightInfo.provinceName,
+					cityName: this.sightInfo.cityName
+				}
+				this.$store.commit('setPunchInfo', info)
+				uni.switchTab({
+					url: '/pages/punch/index'
 				})
-			},
+			}
 		}
 		
 	}
 </script>
 
 <style lang="less">
-	.sights-detail {
-		.sight-info {
+	.place-detail {
+		.place-info {
 			padding-bottom: 40rpx;
 			margin-bottom: 20rpx;
 			rich-text {
@@ -164,55 +165,61 @@
 		.desc {
 			line-height: 50rpx;
 		}
-		.sight-img {
+		.place-img {
 			width: 100%;
 			height: 280rpx;
 			margin: 10rpx 0;
 			border-radius: 10rpx;
 		}
-		.place-list {
-			padding: 30rpx 0;
-			display: flex;
-			border-bottom: 6rpx solid #f7f9fd;
-			image{
-				width: 215rpx;
-				height: 175rpx;
-				border-radius: 5rpx;
-				margin-right: 20rpx;
-			}
-			.place-info {
-				flex: 1;
-				display: flex;
-				flex-direction: column;
-				// justify-content: space-around;
-				.info-title {
-					// font-size: 28rpx;
-					line-height: 40rpx;
-					font-weight: bold;
-					display: -webkit-box;
-					-webkit-box-orient: vertical;
-					-webkit-line-clamp: 2;
-					overflow: hidden;
-				}
-				.info-desc {
-					font-size: 26rpx;
-					display: -webkit-box;
-					-webkit-box-orient: vertical;
-					-webkit-line-clamp: 3;
-					overflow: hidden;
-					color: #626262;
-					line-height: 1.2;
-					margin-top: 8rpx;
+		.place-comment {
+			.fw {
+				padding: 20rpx 30rpx;
+				font-size: 32rpx;
+				&.border-bt-1px:after {
+					left: 30rpx;
+					right: 30rpx;
 				}
 			}
-			&:first-of-type {
-				padding-top: 10rpx;
+			sight-item {
+				.border-bt-1px:after {
+					height: 0;
+				}
 			}
-			&:last-of-type {
-				border-bottom: none
+			.load-more {
+				background-color: #fff;
+			}
+			.no-data {
+				margin: 0;
+				padding: 40rpx 0;
 			}
 		}
-		
-	
+		.comment-bottom {
+			overflow: hidden;
+			color: #8f949a;
+			.icon-heart-fill {
+				color: f66b6f;
+				margin: 0 10rpx 0 40rpx;
+			}
+		}
+		.punch{
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			position: fixed;
+			right: 30rpx;
+			bottom: 100rpx;
+			width: 130rpx;
+			height: 130rpx;
+			border-radius: 50%;
+			background-color: #fff;
+			color: #71e1e8;
+			box-shadow: 0 0 10rpx #8f949a;
+			font-size: 24rpx;
+			.icon-pinglun {
+				color: #25d5e0;
+				font-size: 36rpx;
+				line-height: 1;
+			}
+		}
 	}
 </style>

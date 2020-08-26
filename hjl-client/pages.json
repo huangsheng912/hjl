@@ -23,6 +23,13 @@
 			}
 		},
 		{
+			"path": "pages/placeDetail/index",
+			"style": {
+				"navigationBarTitleText": "景点详情",
+				"onReachBottomDistance": 50
+			}
+		},
+		{
 			"path": "pages/punchDetail/index",
 			"style": {
 				"navigationBarTitleText": "打卡详情",

@@ -136,6 +136,8 @@ class Main extends React.Component {
       img.splice(index,1)
       this.setState({
         [name]: img
+      },()=>{
+        this.props.form.setFieldsValue({[name]: this.state[name]})
       })
     }
   }

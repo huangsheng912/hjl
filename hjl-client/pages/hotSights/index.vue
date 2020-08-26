@@ -97,20 +97,10 @@
 				})
 			},
 			toDetail(id, name) {
-				const place = this.sights.filter(v=>v.id===id)[0]
-				const placeId = place.placeList ? place.placeList[0].id : ''
-				const placeName = place.placeList ? place.placeList[0].name : ''
-				if (placeId) {
-					this.addViewTimes(id)
-					uni.navigateTo({
-						url:`/pages/sightsDetail/index?id=${placeId}&name=${placeName}`,
-					})
-				} else {
-					uni.showToast({
-						title: '该景区暂无打卡点',
-						icon: 'none'
-					})
-				}
+				this.addViewTimes(id)
+				uni.navigateTo({
+					url:`/pages/sightsDetail/index?id=${id}&name=${name}`,
+				})
 			},
 			//增加浏览次数
 			addViewTimes(id) {

@@ -1,10 +1,11 @@
 import React from 'react'
 import './index.less';
 import {post} from 'utils/request'
-import {Button, Divider, Input, message, Select} from "antd";
+import {Button, Divider, Input, message, Select,  Modal} from "antd";
 import moment from "moment";
 import Table from "components/Table";
 import {inject, observer} from "mobx-react";
+const { confirm } = Modal;
 
 const {Option} = Select
 
@@ -141,7 +142,7 @@ class PunchPoint extends React.Component {
       }
     ]
     //申请入驻弹窗
-    function showModal(type,id) {
+    function showModal(id) {
       confirm({
         title: '确定删除该打卡点',
         content: '',
