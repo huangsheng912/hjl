@@ -10,13 +10,19 @@
 			circular="true"
 			>
 				<swiper-item>
-					<view class="swiper-item bg-red">1</view>
+					<view class="swiper-item">
+						<image src="../../static/img/banner01.jpg" mode=""></image>
+					</view>
 				</swiper-item>
 				<swiper-item>
-					<view class="swiper-item bg-blue">2</view>
+					<view class="swiper-item">
+						<image src="../../static/img/banner02.jpg" mode=""></image>
+					</view>
 				</swiper-item>
 				<swiper-item>
-					<view class="swiper-item bg-yellow">3</view>
+					<view class="swiper-item">
+						<image src="../../static/img/banner03.jpg" mode=""></image>
+					</view>
 				</swiper-item>
 			</swiper>
 		</view>
@@ -228,6 +234,10 @@
 				height: 300rpx;
 				line-height: 300rpx;
 				text-align: center;
+				image {
+					width: 100%;
+					height: 100%;
+				}
 			}
 		}
 		.quick-entry {
