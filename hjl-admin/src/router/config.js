@@ -25,6 +25,7 @@ const Profit = LoadableBar(()=>import('page/assetsManage/profit'));
 const Integral = LoadableBar(()=>import('page/assetsManage/integral'));
 
 const AccountManage = LoadableBar(()=>import('page/systemManage/accountManage'));
+const BannerManage = LoadableBar(()=>import('page/systemManage/bannerManage'));
 
 
 
@@ -128,6 +129,12 @@ const config = [
         title: '账号管理',
         value: '/systemManage/accountManage',
         component: AccountManage,
+        role: 'sys',
+      },
+      {
+        title: '轮播图管理',
+        value: '/systemManage/bannerManage',
+        component: BannerManage,
         role: 'sys',
       },
       /*{

@@ -5,6 +5,7 @@
 		onLaunch: function() {
 			// this.updateUserInfo()
 			console.log('App Launch')
+			this.checkUpdate()
 			// uni.clearStorage()
 		},
 		//当 uni-app 启动，或从后台进入前台显示
@@ -23,6 +24,44 @@
 			console.log('App Hide')
 		},
 		methods: {
+			//检查更新
+			checkUpdate() {
+				const updateManager = uni.getUpdateManager();
+				updateManager.onCheckForUpdate((res) => {
+				  // 请求完新版本信息的回调
+				  // console.log(res);
+					if (res.hasUpdate) {
+						uni.showModal({
+							title: '更新提示',
+							content: '检测到新版本，是否下载新版本并重启小程序',
+							success: (res) => {
+								if(res.confirm){
+								 // 用户确定更新小程序，小程序下载和更新静默进行
+									this.downLoadAndUpdate(updateManager)
+								}
+						  }
+					  })
+					}
+				});
+			},
+			// 下载小程序最新版本并重启
+			downLoadAndUpdate(updateManager){
+				uni.showLoading()
+				// 静默下载更新小程序新版本，onUpdateReady：当新版本下载完成回调
+				updateManager.onUpdateReady(function(){
+					uni.hideLoading()
+					// applyUpdate：强制当前小程序应用新版本并重启
+					updateManager.applyUpdate()
+				})
+				// onUpdateFailed：当新版本下载失败回调
+				updateManager.onUpdateFailed(function (res) {
+				  // 新的版本下载失败
+					uni.showModal({
+						title: '自动更新失败',
+						content: '请删除当前小程序，重新搜索打开',
+					})
+				});
+			},
 			//更新用户头像等信息
 			updateUserInfo() {
 				uni.getSetting({

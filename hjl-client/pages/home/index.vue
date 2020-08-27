@@ -9,7 +9,12 @@
 			:duration="1000"
 			circular="true"
 			>
-				<swiper-item>
+				<swiper-item v-for="item in banners" :key="item">
+					<view class="swiper-item">
+						<image :src="item" mode=""></image>
+					</view>
+				</swiper-item>
+				<!-- <swiper-item>
 					<view class="swiper-item">
 						<image src="../../static/img/banner01.jpg" mode=""></image>
 					</view>
@@ -23,7 +28,7 @@
 					<view class="swiper-item">
 						<image src="../../static/img/banner03.jpg" mode=""></image>
 					</view>
-				</swiper-item>
+				</swiper-item> -->
 			</swiper>
 		</view>
 		<view class="quick-entry">
@@ -77,7 +82,8 @@
 			this.provinceCode = ''
 			return {
 				sights: [],
-				status: 'more'
+				status: 'more',
+				banners: []
 			}
 		},
 		components:{
@@ -130,6 +136,9 @@
 			//轮播图
 			async getBanner() {
 				const res = await rPost('', 'getBanner',{})
+				if (res.result) {
+					this.banners = res.result
+				}
 			},
 			//正在打卡
 			async getPunchingList() {
